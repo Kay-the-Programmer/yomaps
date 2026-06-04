@@ -15,14 +15,19 @@ export const slugify = (str) =>
 
 export const cn = (...classes) => classes.filter(Boolean).join(' ')
 
-// Resolve a product image path to a full URL. Uploaded images are stored as
-// "/uploads/<file>" (relative to the API origin); absolute URLs pass through.
+// Resolve a product image reference to a usable URL.
+// - absolute URLs (Cloudinary, etc.) pass through
+// - server-uploaded files ("/uploads/...") get the API origin prefixed
+// - anything else (Vite-bundled asset URLs) is returned as-is
 export const imageUrl = (path) => {
   if (!path) return ''
   if (/^https?:\/\//i.test(path)) return path
-  const apiBase = import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
-  const origin = apiBase.replace(/\/api\/?$/, '')
-  return `${origin}${path.startsWith('/') ? '' : '/'}${path}`
+  if (path.startsWith('/uploads')) {
+    const apiBase = import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
+    const origin = apiBase.replace(/\/api\/?$/, '')
+    return `${origin}${path}`
+  }
+  return path
 }
 
 export const truncate = (str, n) =>

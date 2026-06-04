@@ -1,6 +1,17 @@
 // Static product catalogue for DEMO mode (no backend). Mirrors server/data/seed.js.
 // _id is set to the slug so cart keys, routing, and order items all work offline.
 
+import vovTee from '../../assets/images/products/vov-tee.png'
+import vovMug from '../../assets/images/products/vov-mug.png'
+import ymCap from '../../assets/images/products/ym-cap.png'
+
+// Product photos (others fall back to the generated SVG)
+const IMAGES = {
+  'vibes-on-vibes-tee':      [vovTee],
+  'ym-logo-mug':             [vovMug],
+  'maps-signature-snapback': [ymCap]
+}
+
 const raw = [
   // APPAREL
   { slug:'vibes-on-vibes-tee', name:'Vibes on Vibes Tee', category:'apparel', price_zmw:250, price_usd:13, description:'Drop-shoulder tee from the Vibes on Vibes album era. 100% heavyweight cotton. Gold YM monogram print.', sizes:['S','M','L','XL','XXL'], tags:['new'], album:'Vibes on Vibes', in_stock:true, stock_count:80 },
@@ -38,7 +49,7 @@ const raw = [
 
 export const PRODUCTS = raw.map((p, i) => ({
   _id: p.slug,
-  images: [],
   created_at: new Date(Date.now() - i * 86400000).toISOString(),
-  ...p
+  ...p,
+  images: IMAGES[p.slug] || []
 }))

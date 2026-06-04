@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react'
 import { gsap } from 'gsap'
 import { Helmet } from 'react-helmet-async'
 import { useGsapReveal } from '../../hooks/useGsapReveal'
-import heroImage from '../../../assets/images/yomaps.jpg'
+import heroImage from '../../../assets/images/about/yo-mpas-about.jpg'
 import styles from './About.module.css'
 
 const TIMELINE = [
