@@ -1,0 +1,117 @@
+.card {
+  position: relative;
+  background: var(--color-surface);
+  border: 0.5px solid var(--color-border);
+  border-radius: 3px;
+  overflow: hidden;
+  cursor: none;
+  display: flex;
+  flex-direction: column;
+}
+
+@media (max-width: 1023px) {
+  .card {
+    cursor: pointer;
+  }
+}
+
+.imageWrapper {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 1 / 1;
+  background: var(--color-surface-2);
+}
+
+.image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.badges {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  z-index: 2;
+}
+
+.addBtn {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--color-gold);
+  color: #0a0a0a;
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 12px;
+  text-align: center;
+  opacity: 0;
+  transform: translateY(12px);
+  z-index: 3;
+  cursor: none;
+}
+
+@media (max-width: 1023px) {
+  .addBtn {
+    opacity: 1;
+    transform: translateY(0);
+    cursor: pointer;
+  }
+}
+
+.info {
+  padding: 14px 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.category {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.name {
+  font-family: var(--font-display);
+  font-size: 18px;
+  letter-spacing: 0.06em;
+  line-height: 1.2;
+  color: var(--color-text);
+}
+
+.prices {
+  margin-top: 6px;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.priceZmw {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-gold);
+}
+
+.priceUsd {
+  font-size: 12px;
+  color: var(--color-text-muted);
+}

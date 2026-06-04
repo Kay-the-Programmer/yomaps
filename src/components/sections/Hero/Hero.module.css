@@ -1,0 +1,196 @@
+.hero {
+  position: relative;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 120px var(--page-pad-x) 56px;
+  overflow: hidden;
+  text-align: center;
+}
+
+/* ── Background photo (with overscan for parallax) ──────────── */
+
+.media {
+  position: absolute;
+  top: -9%;
+  left: 0;
+  width: 100%;
+  height: 118%;
+  z-index: 0;
+  will-change: transform;
+}
+
+.img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 28%;
+  transform-origin: center 30%;
+  will-change: transform;
+}
+
+/* Bottom-weighted scrim: keeps the face bright up top, darkens the
+   bottom for legible overlay text, plus a faint top wash for the navbar. */
+.scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(
+    to top,
+    rgba(var(--hero-scrim-rgb), 0.96) 0%,
+    rgba(var(--hero-scrim-rgb), 0.78) 18%,
+    rgba(var(--hero-scrim-rgb), 0.30) 42%,
+    rgba(var(--hero-scrim-rgb), 0.04) 62%,
+    rgba(var(--hero-scrim-rgb), 0.10) 82%,
+    rgba(var(--hero-scrim-rgb), 0.46) 100%
+  );
+  pointer-events: none;
+  transition: background var(--transition-base);
+}
+
+/* ── Overlay content (bottom-center) ────────────────────────── */
+
+.content {
+  position: relative;
+  z-index: 2;
+  max-width: 720px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  will-change: transform;
+}
+
+.eyebrow {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--color-gold);
+  margin-bottom: 18px;
+}
+
+.headline {
+  font-family: var(--font-display);
+  font-size: clamp(58px, 11vw, 132px);
+  letter-spacing: 0.08em;
+  line-height: 0.92;
+  color: rgb(var(--hero-text-rgb));
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0 0.32em;
+  text-shadow: var(--hero-headline-shadow);
+  transition: color var(--transition-base), text-shadow var(--transition-base);
+}
+
+.wordMask {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: top;
+  padding-bottom: 0.08em;
+}
+
+.word {
+  display: inline-block;
+  will-change: transform;
+}
+
+.accent {
+  color: var(--color-gold);
+}
+
+.subline {
+  font-size: clamp(14px, 1.8vw, 17px);
+  color: rgba(var(--hero-text-rgb), 0.82);
+  line-height: 1.7;
+  max-width: 480px;
+  margin: 22px 0 32px;
+  transition: color var(--transition-base);
+}
+
+.ctas {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+/* ── Scroll cue ─────────────────────────────────────────────── */
+
+.cue {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin-top: 40px;
+}
+
+.cueLabel {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: rgba(var(--hero-text-rgb), 0.6);
+}
+
+.cueLine {
+  position: relative;
+  display: block;
+  width: 1px;
+  height: 40px;
+  background: rgba(var(--hero-text-rgb), 0.25);
+  overflow: hidden;
+}
+
+.cueDot {
+  position: absolute;
+  left: -1px;
+  top: 0;
+  width: 3px;
+  height: 13px;
+  background: var(--color-gold);
+  animation: cueTravel 2.2s ease-in-out infinite;
+}
+
+@keyframes cueTravel {
+  0%   { transform: translateY(-15px); opacity: 0; }
+  35%  { opacity: 1; }
+  100% { transform: translateY(40px); opacity: 0; }
+}
+
+/* ── Responsive ─────────────────────────────────────────────── */
+
+@media (max-width: 640px) {
+  .hero {
+    padding: 100px var(--page-pad-x) 44px;
+  }
+
+  .img {
+    object-position: 50% 22%;
+  }
+
+  .ctas {
+    flex-direction: column;
+    width: 100%;
+    max-width: 320px;
+  }
+
+  .ctas a,
+  .ctas button {
+    width: 100%;
+  }
+
+  .cue {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cueDot {
+    animation: none;
+  }
+}

@@ -1,0 +1,117 @@
+.tile {
+  position: relative;
+  background: var(--color-surface);
+  border: 0.5px solid var(--color-border);
+  border-radius: 3px;
+  padding: 28px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow: hidden;
+  transition: border-color var(--transition-base), background var(--transition-base), transform var(--transition-base);
+  text-decoration: none;
+  min-height: 132px;
+}
+
+.tile:hover {
+  border-color: var(--color-border-hover);
+  background: var(--color-surface-2);
+  transform: translateY(-4px);
+}
+
+/* Gold accent line that sweeps across the top on hover */
+.line {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 2px;
+  width: 100%;
+  background: var(--color-gold);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform var(--transition-slow);
+}
+
+.tile:hover .line {
+  transform: scaleX(1);
+}
+
+/* Big ghosted index numeral in the corner */
+.index {
+  position: absolute;
+  top: 10px;
+  right: 14px;
+  font-family: var(--font-display);
+  font-size: 40px;
+  line-height: 1;
+  letter-spacing: 0.04em;
+  color: var(--color-text);
+  opacity: 0.06;
+  transition: opacity var(--transition-base), color var(--transition-base);
+  pointer-events: none;
+}
+
+.tile:hover .index {
+  opacity: 0.14;
+  color: var(--color-gold);
+}
+
+.icon {
+  font-size: 24px;
+  line-height: 1;
+  color: var(--color-gold);
+  transition: transform var(--transition-base);
+}
+
+.tile:hover .icon {
+  transform: translateY(-2px) scale(1.08);
+}
+
+.name {
+  font-family: var(--font-display);
+  font-size: clamp(17px, 2.2vw, 22px);
+  letter-spacing: 0.08em;
+  color: var(--color-text);
+  line-height: 1.1;
+  margin-top: auto;
+}
+
+.count {
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.arrow {
+  position: absolute;
+  bottom: 14px;
+  right: 16px;
+  font-size: 16px;
+  color: var(--color-gold);
+  opacity: 0;
+  transform: translateX(-6px);
+  transition: opacity var(--transition-base), transform var(--transition-base);
+}
+
+.tile:hover .arrow {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+@media (max-width: 640px) {
+  .tile {
+    padding: 20px 16px;
+    min-height: 110px;
+  }
+
+  .index {
+    font-size: 32px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tile:hover {
+    transform: none;
+  }
+}

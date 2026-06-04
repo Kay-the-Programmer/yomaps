@@ -1,0 +1,228 @@
+.page {
+  padding: var(--page-pad-top) var(--page-pad-x) 80px;
+  min-height: 100vh;
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: clamp(40px, 6vw, 56px);
+  letter-spacing: 0.1em;
+  color: var(--color-text);
+  margin-bottom: 44px;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 1fr 360px;
+  gap: 56px;
+  align-items: start;
+}
+
+.form { display: flex; flex-direction: column; gap: 36px; }
+
+.formSection { display: flex; flex-direction: column; gap: 14px; }
+
+.sectionTitle {
+  font-family: var(--font-display);
+  font-size: 18px;
+  letter-spacing: 0.1em;
+  color: var(--color-text);
+  padding-bottom: 10px;
+  border-bottom: 0.5px solid var(--color-border);
+}
+
+.fieldRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.input {
+  width: 100%;
+  background: var(--color-surface);
+  border: 0.5px solid var(--color-border);
+  color: var(--color-text);
+  font-family: var(--font-body);
+  font-size: 14px;
+  padding: 12px 16px;
+  border-radius: 2px;
+  outline: none;
+  transition: border-color var(--transition-fast), background var(--transition-fast);
+  -webkit-appearance: none;
+}
+
+.input::placeholder { color: var(--color-text-muted); }
+.input:focus { border-color: var(--color-gold); background: var(--color-surface-2); }
+
+.stripeNote {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  background: var(--color-surface-2);
+  border: 0.5px solid var(--color-border);
+  border-radius: 2px;
+  padding: 14px 16px;
+}
+
+.stripeLock { font-size: 18px; color: var(--color-gold); line-height: 1.4; }
+.stripeNote p { font-size: 13px; color: var(--color-text-muted); line-height: 1.5; }
+.stripeElements { display: flex; flex-direction: column; gap: 12px; }
+.cardPlaceholder { display: flex; flex-direction: column; gap: 12px; opacity: 0.4; }
+.stripeHint { font-size: 11px; color: var(--color-text-muted); font-style: italic; }
+.submitError { font-size: 13px; color: #f87171; }
+
+/* Order summary */
+.orderSummary {
+  background: var(--color-surface);
+  border: 0.5px solid var(--color-border);
+  border-radius: 3px;
+  padding: 24px;
+  position: sticky;
+  top: 80px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.orderItems {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-bottom: 14px;
+  border-bottom: 0.5px solid var(--color-border);
+}
+
+.orderItem { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+.orderItemInfo { display: flex; flex-direction: column; gap: 2px; }
+.orderItemName { font-size: 13px; color: var(--color-text); }
+.orderItemMeta { font-size: 11px; color: var(--color-text-muted); }
+.orderItemPrice { font-size: 13px; color: var(--color-gold); font-weight: 600; white-space: nowrap; }
+
+.summaryLine { display: flex; justify-content: space-between; font-size: 13px; color: var(--color-text-muted); }
+.totalLine {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-text);
+  padding-top: 10px;
+  border-top: 0.5px solid var(--color-border);
+}
+
+.totalLine span:last-child { color: var(--color-gold); }
+
+.empty { padding: 140px var(--page-pad-x); text-align: center; color: var(--color-text-muted); }
+.empty a { color: var(--color-gold); }
+
+/* ── Step progress ─────────────────────────────────────────── */
+.progress {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 32px;
+  flex-wrap: wrap;
+}
+.progressStep {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--color-text-muted);
+}
+.progressDot {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 600;
+  flex-shrink: 0;
+  transition: all var(--transition-base);
+}
+.progressLabel {
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.progressActive .progressDot { background: var(--color-gold); border-color: var(--color-gold); color: #0a0a0a; }
+.progressActive .progressLabel { color: var(--color-text); }
+.progressDone .progressDot { border-color: var(--color-gold); color: var(--color-gold); }
+.progressBar { flex: 1; height: 1px; min-width: 18px; background: var(--color-border); }
+.progressBarDone { background: var(--color-gold); }
+
+.stepActions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-top: 8px;
+}
+.backBtn {
+  background: none;
+  border: 0.5px solid var(--color-border);
+  color: var(--color-text-muted);
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 12px 20px;
+  border-radius: 2px;
+  cursor: pointer;
+  transition: color var(--transition-fast), border-color var(--transition-fast);
+}
+.backBtn:hover { color: var(--color-text); border-color: var(--color-border-hover); }
+
+.testNote {
+  font-size: 11px;
+  color: var(--color-text-muted);
+  font-style: italic;
+  margin-top: 4px;
+}
+.review { display: flex; flex-direction: column; gap: 6px; }
+.reviewLine { font-size: 13px; color: var(--color-text-muted); }
+.reviewLine strong { color: var(--color-text); font-weight: 500; }
+/* ── Payment method selector ─────────────────────────────────── */
+.payMethods {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.payMethod {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  text-align: left;
+  padding: 16px;
+  background: var(--color-surface);
+  border: 0.5px solid var(--color-border);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: border-color var(--transition-fast), background var(--transition-fast);
+}
+.payMethod:hover { border-color: var(--color-border-hover); }
+.payMethodActive {
+  border-color: var(--color-gold);
+  background: var(--color-surface-2);
+}
+.payIcon { color: var(--color-gold); margin-bottom: 4px; }
+.payLabel {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text);
+}
+.payHint {
+  font-size: 11px;
+  color: var(--color-text-muted);
+  line-height: 1.4;
+}
+
+/* ── Responsive ─────────────────────────────────────────────── */
+
+@media (max-width: 1023px) {
+  .layout { grid-template-columns: 1fr; gap: 40px; }
+  .orderSummary { position: static; order: -1; }
+}
+
+@media (max-width: 640px) {
+  .fieldRow { grid-template-columns: 1fr; }
+  .payMethods { grid-template-columns: 1fr; }
+}

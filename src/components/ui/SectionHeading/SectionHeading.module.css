@@ -1,0 +1,117 @@
+.heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 40px;
+}
+
+.heading.center {
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 14px;
+}
+
+.titleWrap {
+  min-width: 0;
+}
+
+.eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  margin-bottom: 16px;
+}
+
+.center .eyebrow {
+  justify-content: center;
+}
+
+.index {
+  color: var(--color-gold);
+  font-variant-numeric: tabular-nums;
+}
+
+.dash {
+  width: 28px;
+  height: 1px;
+  background: var(--color-gold);
+  opacity: 0.6;
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: clamp(36px, 5.5vw, 56px);
+  letter-spacing: 0.07em;
+  line-height: 0.95;
+  color: var(--color-text);
+}
+
+/* Word-level masks for the staggered reveal */
+.wordMask {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: top;
+  padding-bottom: 0.06em;
+}
+
+.wordMask:not(:last-child) {
+  margin-right: 0.28em;
+}
+
+.word {
+  display: inline-block;
+  will-change: transform;
+}
+
+/* Action link */
+.action {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-gold);
+  white-space: nowrap;
+  padding-bottom: 4px;
+  position: relative;
+}
+
+.action::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 0;
+  height: 1px;
+  background: var(--color-gold);
+  transition: width var(--transition-base);
+}
+
+.action:hover::after {
+  width: 100%;
+}
+
+.actionArrow {
+  transition: transform var(--transition-base);
+}
+
+.action:hover .actionArrow {
+  transform: translateX(4px);
+}
+
+@media (max-width: 640px) {
+  .heading {
+    align-items: flex-start;
+    gap: 16px;
+  }
+}

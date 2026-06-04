@@ -1,0 +1,53 @@
+.skeleton {
+  background: var(--color-surface);
+  border: 0.5px solid var(--color-border);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.image {
+  aspect-ratio: 1 / 1;
+  background: var(--color-surface-2);
+  position: relative;
+  overflow: hidden;
+}
+
+.image::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.04) 50%, transparent 100%);
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.info {
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.line {
+  height: 10px;
+  border-radius: 2px;
+  background: var(--color-surface-2);
+  position: relative;
+  overflow: hidden;
+}
+
+.line::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.04) 50%, transparent 100%);
+  animation: shimmer 1.5s infinite;
+}
+
+.lineShort { width: 50%; }
+.lineMed   { width: 75%; }
+.lineFull  { width: 100%; }

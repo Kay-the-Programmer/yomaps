@@ -1,0 +1,42 @@
+.section {
+  padding: 80px 80px 80px;
+}
+
+.sliderWrapper {
+  padding: 0 28px; /* room for arrows */
+}
+
+.skeletonGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+@media (max-width: 1023px) {
+  .section {
+    padding: 60px 30px;
+  }
+
+  .sliderWrapper {
+    padding: 0 20px;
+  }
+
+  .skeletonGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .section {
+    padding: 50px 20px;
+  }
+
+  .sliderWrapper {
+    padding: 0;
+  }
+
+  .skeletonGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+}
