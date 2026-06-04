@@ -32,6 +32,29 @@ const IMAGES = {
   'ym-logo-mug':             [vovMug]
 }
 
+// Tiny blurred placeholders (base64) for instant blur-up loading.
+const lqipModules = import.meta.glob('../../assets/images/products/*.png', {
+  eager: true,
+  query: '?w=24&format=webp&inline',
+  import: 'default'
+})
+const lqip = (file) => lqipModules[`../../assets/images/products/${file}`]
+
+const LQIP = {
+  'vibes-on-vibes-tee':      lqip('vov-tee.png'),
+  'finally-anniversary-tee': lqip('finally-tee.png'),
+  'mr-romantic-hoodie':      lqip('mr-romantic-hoodie.png'),
+  'komando-hoodie':          lqip('kommando-heavy-wheight.png'),
+  'yo-maps-zip-jacket':      lqip('ym-zip-up.png'),
+  'maps-signature-snapback': lqip('ym-cap.png'),
+  'olios-dad-cap':           lqip('olios-dads-cap.png'),
+  'vibes-bucket-hat':        lqip('vov-bucket-hat-f.png'),
+  'ym-tote-bag':             lqip('vov-tote.png'),
+  'maps-backpack':           lqip('ym-backpack-f.png'),
+  'ym-beanie':               lqip('ym-beanie.png'),
+  'ym-logo-mug':             lqip('vov-mug.png')
+}
+
 const raw = [
   // APPAREL
   { slug:'vibes-on-vibes-tee', name:'Vibes on Vibes Tee', category:'apparel', price_zmw:250, price_usd:13, description:'Drop-shoulder tee from the Vibes on Vibes album era. 100% heavyweight cotton. Gold YM monogram print.', sizes:['S','M','L','XL','XXL'], tags:['new'], album:'Vibes on Vibes', in_stock:true, stock_count:80 },
@@ -59,5 +82,6 @@ export const PRODUCTS = raw.map((p, i) => ({
   _id: p.slug,
   created_at: new Date(Date.now() - i * 86400000).toISOString(),
   ...p,
-  images: IMAGES[p.slug] || []
+  images: IMAGES[p.slug] || [],
+  lqip: LQIP[p.slug] || null
 }))

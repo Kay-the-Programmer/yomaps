@@ -1,0 +1,43 @@
+.wrap {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.lqip,
+.img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.lqip {
+  filter: blur(14px);
+  transform: scale(1.08);
+  transition: opacity 0.5s ease;
+}
+
+.lqip.hidden {
+  opacity: 0;
+}
+
+.img {
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.img.loaded {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lqip,
+  .img {
+    transition: none;
+  }
+}

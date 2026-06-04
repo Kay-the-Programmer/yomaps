@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { gsap } from 'gsap'
 import Badge from '../Badge/Badge'
 import ProductSVG from '../ProductSVG/ProductSVG'
+import ProgressiveImage from '../ProgressiveImage/ProgressiveImage'
 import { getCategoryLabel, imageUrl } from '../../../lib/utils'
 import styles from './ProductCard.module.css'
 
@@ -58,11 +59,10 @@ export default function ProductCard({ product, onAddToCart }) {
       <div className={styles.imageWrapper}>
         <div ref={imageRef} style={{ width: '100%', height: '100%' }}>
           {primaryImage ? (
-            <img
-              className={styles.photo}
+            <ProgressiveImage
               src={imageUrl(primaryImage)}
+              lqip={product.lqip}
               alt={product.name}
-              loading="lazy"
             />
           ) : (
             <ProductSVG category={product.category} name={product.name} />
