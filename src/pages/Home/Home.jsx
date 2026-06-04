@@ -10,7 +10,7 @@ export default function Home() {
     <>
       <Helmet>
         <title>Yo Maps Official Store — Wear the Vibe</title>
-        <meta name="description" content="Official merchandise from Zambia's most-streamed artist. T-shirts, hoodies, caps, collectibles and exclusive drops." />
+        <meta name="description" content="Official merchandise from Zambia's most-streamed artist. T-shirts, hoodies, caps, and lifestyle gear." />
       </Helmet>
       <Hero />
       <FeaturedProducts />

@@ -9,7 +9,7 @@ import ProductCard from '../../components/ui/ProductCard/ProductCard'
 import SkeletonCard from '../../components/ui/SkeletonCard/SkeletonCard'
 import styles from './Shop.module.css'
 
-const CATEGORIES = ['apparel', 'headwear', 'accessories', 'music', 'lifestyle', 'exclusive']
+const CATEGORIES = ['apparel', 'headwear', 'accessories', 'lifestyle']
 const SORTS = [
   { value: 'newest',      label: 'Newest' },
   { value: 'best_seller', label: 'Best Sellers' },

@@ -9,9 +9,7 @@ const CATEGORIES = [
   { slug: 'apparel',     name: 'Apparel' },
   { slug: 'headwear',    name: 'Headwear' },
   { slug: 'accessories', name: 'Accessories' },
-  { slug: 'music',       name: 'Music & Collectibles' },
-  { slug: 'lifestyle',   name: 'Lifestyle' },
-  { slug: 'exclusive',   name: 'Exclusive Drops' }
+  { slug: 'lifestyle',   name: 'Lifestyle' }
 ]
 
 export default function CategoryGrid() {

@@ -40,10 +40,10 @@ const SOCIAL_LINKS = [
 ]
 
 const STORE_LINKS = [
-  { to: '/shop',           label: 'All Products' },
-  { to: '/shop/apparel',   label: 'Apparel' },
-  { to: '/shop/headwear',  label: 'Headwear' },
-  { to: '/shop/exclusive', label: 'Exclusive Drops' }
+  { to: '/shop',            label: 'All Products' },
+  { to: '/shop/apparel',    label: 'Apparel' },
+  { to: '/shop/headwear',   label: 'Headwear' },
+  { to: '/shop/lifestyle',  label: 'Lifestyle' }
 ]
 
 const INFO_LINKS = [

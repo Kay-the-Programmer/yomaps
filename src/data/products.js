@@ -4,12 +4,32 @@
 import vovTee from '../../assets/images/products/vov-tee.png'
 import vovMug from '../../assets/images/products/vov-mug.png'
 import ymCap from '../../assets/images/products/ym-cap.png'
+import finallyTee from '../../assets/images/products/finally-tee.png'
+import komandoHoodie from '../../assets/images/products/kommando-heavy-wheight.png'
+import bucketF from '../../assets/images/products/vov-bucket-hat-f.png'
+import bucketB from '../../assets/images/products/vov-bucket-hat-b.png'
+import tote from '../../assets/images/products/vov-tote.png'
+import backpackF from '../../assets/images/products/ym-backpack-f.png'
+import backpackB from '../../assets/images/products/ym-backpack-b.png'
+import beanie from '../../assets/images/products/ym-beanie.png'
+import mrRomantic from '../../assets/images/products/mr-romantic-hoodie.png'
+import oliosCap from '../../assets/images/products/olios-dads-cap.png'
+import zipUp from '../../assets/images/products/ym-zip-up.png'
 
 // Product photos (others fall back to the generated SVG)
 const IMAGES = {
   'vibes-on-vibes-tee':      [vovTee],
-  'ym-logo-mug':             [vovMug],
-  'maps-signature-snapback': [ymCap]
+  'finally-anniversary-tee': [finallyTee],
+  'mr-romantic-hoodie':      [mrRomantic],
+  'komando-hoodie':          [komandoHoodie],
+  'yo-maps-zip-jacket':      [zipUp],
+  'maps-signature-snapback': [ymCap],
+  'olios-dad-cap':           [oliosCap],
+  'vibes-bucket-hat':        [bucketF, bucketB],
+  'ym-tote-bag':             [tote],
+  'maps-backpack':           [backpackF, backpackB],
+  'ym-beanie':               [beanie],
+  'ym-logo-mug':             [vovMug]
 }
 
 const raw = [
@@ -28,23 +48,11 @@ const raw = [
   // ACCESSORIES
   { slug:'ym-tote-bag', name:'YM Tote Bag', category:'accessories', price_zmw:170, price_usd:9, description:'Heavy-duty canvas tote. YM monogram screen print. 15L capacity.', sizes:null, tags:['new'], album:null, in_stock:true, stock_count:80 },
   { slug:'maps-backpack', name:'Maps Logo Backpack', category:'accessories', price_zmw:480, price_usd:25, description:'Water-resistant backpack. Padded laptop sleeve. Embossed YM badge.', sizes:null, tags:[], album:null, in_stock:true, stock_count:25 },
-  { slug:'phone-grip', name:'Phone Grip / PopSocket', category:'accessories', price_zmw:90, price_usd:5, description:'Swappable phone grip. Gold YM design. Works with all cases.', sizes:null, tags:[], album:null, in_stock:true, stock_count:120 },
-  { slug:'lanyard-keyring', name:'Lanyard & Keyring Set', category:'accessories', price_zmw:80, price_usd:4, description:'YM branded lanyard + matching metal keyring. Festival essential.', sizes:null, tags:[], album:null, in_stock:true, stock_count:150 },
-  // MUSIC & COLLECTIBLES
-  { slug:'vibes-signed-poster', name:'Vibes on Vibes Signed Poster', category:'music', price_zmw:350, price_usd:18, description:'A2 art print. Hand-signed by Yo Maps. Certificate of authenticity included.', sizes:null, tags:['limited'], album:'Vibes on Vibes', in_stock:true, stock_count:40 },
-  { slug:'finally-vinyl', name:'Finally Vinyl Record', category:'music', price_zmw:520, price_usd:27, description:'12" vinyl pressing of "Finally" ft. Macky 2. Collector\'s edition. Numbered sleeve.', sizes:null, tags:['limited'], album:'Finally', in_stock:true, stock_count:20 },
-  { slug:'concert-photo-print', name:'Concert Photo Print (A3)', category:'music', price_zmw:200, price_usd:10, description:'Archival-quality A3 print from the Heroes Stadium concert, Lusaka 2023.', sizes:null, tags:[], album:null, in_stock:true, stock_count:60 },
-  { slug:'autographed-lyric-sheet', name:'Autographed Lyric Sheet', category:'music', price_zmw:600, price_usd:31, description:'Hand-written and signed lyric sheet from "Mr Romantic". Framed, numbered 1–30.', sizes:null, tags:['limited','exclusive'], album:'My Hero', in_stock:true, stock_count:12 },
   // LIFESTYLE
   { slug:'ym-logo-mug', name:'YM Logo Mug', category:'lifestyle', price_zmw:120, price_usd:6, description:'350ml ceramic mug. Gold YM logo. Dishwasher safe. Morning energy.', sizes:null, tags:[], album:null, in_stock:true, stock_count:100 },
   { slug:'vibes-phone-case', name:'Vibes on Vibes Phone Case', category:'lifestyle', price_zmw:140, price_usd:7, description:'Matte black hardshell case. Compatible with iPhone 14–16 and Samsung S-series.', sizes:null, tags:['new'], album:'Vibes on Vibes', in_stock:true, stock_count:80 },
   { slug:'sticker-pack', name:'Sticker Pack (6pc)', category:'lifestyle', price_zmw:60, price_usd:3, description:'Six die-cut vinyl stickers. Waterproof. YM logos, album art, Zambia flag detail.', sizes:null, tags:[], album:null, in_stock:true, stock_count:200 },
-  { slug:'ym-notebook', name:'Notebook — Maps Edition', category:'lifestyle', price_zmw:110, price_usd:6, description:'A5 hardcover notebook. 200 pages, gold-ruled. YM logo embossed on cover.', sizes:null, tags:[], album:null, in_stock:true, stock_count:90 },
-  // EXCLUSIVE DROPS
-  { slug:'vip-fan-bundle', name:'VIP Fan Bundle', category:'exclusive', price_zmw:950, price_usd:49, description:'The full fan package: signed poster + snapback + tee + sticker pack. Ships in branded box.', sizes:['M','L','XL'], tags:['exclusive','limited'], album:null, in_stock:true, stock_count:15 },
-  { slug:'heroes-stadium-tee', name:'Heroes Stadium Memorial Tee', category:'exclusive', price_zmw:380, price_usd:20, description:'Commemorating the 2023 Heroes Stadium concert. Print includes date, set list, and crowd art.', sizes:['S','M','L','XL','XXL'], tags:['exclusive','limited'], album:null, in_stock:true, stock_count:50 },
-  { slug:'afrima-cap', name:'AFRIMA Winner Edition Cap', category:'exclusive', price_zmw:420, price_usd:22, description:'Celebrating Best Male Artist in Southern Africa, AFRIMA 2025. Gold embroidery.', sizes:null, tags:['exclusive','new'], album:null, in_stock:true, stock_count:30 },
-  { slug:'full-bundle-box', name:'Full Merch Bundle Box', category:'exclusive', price_zmw:1200, price_usd:62, description:'Everything. One box. Hoodie, cap, tote, mug, sticker pack, signed poster. The complete set.', sizes:['M','L','XL'], tags:['exclusive'], album:null, in_stock:true, stock_count:10 }
+  { slug:'ym-notebook', name:'Notebook — Maps Edition', category:'lifestyle', price_zmw:110, price_usd:6, description:'A5 hardcover notebook. 200 pages, gold-ruled. YM logo embossed on cover.', sizes:null, tags:[], album:null, in_stock:true, stock_count:90 }
 ]
 
 export const PRODUCTS = raw.map((p, i) => ({

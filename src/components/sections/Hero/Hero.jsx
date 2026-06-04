@@ -31,11 +31,7 @@ export default function Hero() {
       <div className={`hero-scrim ${styles.scrim}`} aria-hidden="true" />
 
       <div className={`hero-content ${styles.content}`}>
-        <p className={`hero-eyebrow ${styles.eyebrow}`}>
-          Olios Records · Lusaka, Zambia
-        </p>
-
-        <h1 className={styles.headline}>
+          <h1 className={styles.headline}>
           {HEADLINE.map((word) => (
             <span className={styles.wordMask} key={word}>
               <span className={`hero-line-inner ${styles.word} ${word === 'VIBE' ? styles.accent : ''}`}>
@@ -46,8 +42,7 @@ export default function Hero() {
         </h1>
 
         <p className={`hero-subline ${styles.subline}`}>
-          Official merchandise from Zambia's most-streamed artist —
-          100M+ streams, a Heroes Stadium sellout, and the 2025 AFRIMA Award.
+          Official merchandise from Zambia's most-streamed artist.
         </p>
 
         <div className={`hero-ctas ${styles.ctas}`}>
