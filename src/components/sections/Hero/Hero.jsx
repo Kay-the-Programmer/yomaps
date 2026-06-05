@@ -2,7 +2,7 @@ import { useRef, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { gsap } from 'gsap'
 import { useGSAP } from '@gsap/react'
-import { heroEntrance, heroScrollFX } from '../../../animations/heroAnimations'
+import { heroEntrance } from '../../../animations/heroAnimations'
 import Button from '../../ui/Button/Button'
 import heroImage from '../../../../assets/images/yomaps.jpg'
 import headlinePaths from '../../../animations/heroHeadlinePaths.json'
@@ -15,8 +15,11 @@ export default function Hero() {
   useGSAP(() => {
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     if (prefersReducedMotion) return
+    // Only the on-load cinematic entrance lives here now. The scroll-out
+    // behaviour is owned by the home page's stacking-slides effect (the hero is
+    // its first pinned panel), so heroScrollFX is intentionally not called —
+    // pinning + its parallax dissolve would fight over the same scroll range.
     const { split } = heroEntrance()
-    heroScrollFX(scopeRef.current)
     return () => split?.revert()
   }, { scope: scopeRef })
 

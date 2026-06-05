@@ -1,0 +1,52 @@
+/* Stacking-slides wrapper for the home page sections below the hero.
+   Each slide pins, scales down + fades as the next slides up over it
+   (logic in animations/stackingSlides.js). Kept dark + gold per the
+   design system — the surface tint just makes the shrinking card legible
+   against the near-black page background. */
+.slidesWrapper {
+  position: relative;
+}
+
+.slide {
+  width: 100%;
+  height: calc(100vh - 64px);
+  overflow: hidden;
+  position: relative;
+  background: var(--color-surface);
+  border-radius: 16px;
+  border: 0.5px solid var(--color-border);
+  will-change: transform, opacity;
+}
+
+/* The hero is the first pinned panel: full-bleed (no card framing) and a full
+   viewport tall so its bottom scroll-cue isn't clipped. */
+.slideHero {
+  height: 100svh;
+  background: var(--color-bg);
+  border: none;
+  border-radius: 0;
+}
+
+/* Content holder — measured + fake-scrolled by the effect. Height is driven
+   by the content so panels taller than the viewport trigger the internal
+   fake-scroll; min-height keeps short sections filling the slide. */
+.slideInner {
+  width: 100%;
+  min-height: 100%;
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* No JS effect runs — let the sections flow normally. */
+  .slide {
+    height: auto;
+    overflow: visible;
+  }
+  .slideInner {
+    min-height: 0;
+    display: block;
+  }
+}

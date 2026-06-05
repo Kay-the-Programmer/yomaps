@@ -82,6 +82,9 @@
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 16px;
+  /* Positioning context so Flip's `absolute: true` anchors cells to the grid
+     (not the page) while it animates the filter reflow. */
+  position: relative;
 }
 
 /* Flip filter cell — wraps each card so its display can toggle and Flip can
@@ -89,6 +92,13 @@
 .cell {
   min-width: 0;
   will-change: transform, opacity;
+}
+
+/* Inner wrapper that carries the velocity-skew transform, kept separate from
+   the cell so the skew never collides with the Flip / entrance animations. */
+.skew {
+  height: 100%;
+  will-change: transform;
 }
 
 .empty {

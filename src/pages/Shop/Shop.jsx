@@ -48,18 +48,28 @@ export default function Shop() {
   const visibleCount = products.filter(matches).length
 
   // Entrance fade for freshly fetched products (initial load / sort change).
+  // overwrite:'auto' lets a re-run cleanly replace any in-flight tween on these
+  // cards; onComplete clears the inline props so nothing is left frozen.
   useEffect(() => {
-    if (!loading && products.length > 0 && gridRef.current) {
-      const cards = gridRef.current.querySelectorAll(':scope > [data-flip-card]')
-      const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-      if (prefersReducedMotion || !cards.length) return
+    if (loading || products.length === 0 || !gridRef.current) return
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
 
-      gsap.fromTo(
-        cards,
-        { opacity: 0, y: 30 },
-        { opacity: 1, y: 0, duration: 0.5, stagger: 0.06, ease: 'power3.out' }
-      )
-    }
+    const cards = gridRef.current.querySelectorAll(':scope > [data-flip-card]')
+    if (!cards.length) return
+
+    gsap.fromTo(
+      cards,
+      { opacity: 0, y: 30 },
+      {
+        opacity: 1,
+        y: 0,
+        duration: 0.5,
+        stagger: 0.06,
+        ease: 'power3.out',
+        overwrite: 'auto',
+        clearProps: 'opacity,transform'
+      }
+    )
   }, [loading, products])
 
   // Flip the grid whenever the category filter changes.
@@ -81,19 +91,25 @@ export default function Shop() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [category])
 
-  // Skew on scroll effect
+  // Velocity-based skew on scroll. Scoped to this page's grid and applied to the
+  // dedicated .skewElem inner wrappers (NOT the flip cells) so it never competes
+  // with the Flip filter animation or the entrance tween over the same transform.
   useGSAP(() => {
     if (loading || products.length === 0) return
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
 
-    let proxy = { skew: 0 }
-    let skewSetter = gsap.quickSetter('.skewElem', 'skewY', 'deg')
-    let clamp = gsap.utils.clamp(-20, 20)
+    const targets = gridRef.current?.querySelectorAll('.skewElem')
+    if (!targets || !targets.length) return
 
-    gsap.set('.skewElem', { transformOrigin: 'right center', force3D: true })
+    const proxy = { skew: 0 }
+    const skewSetter = gsap.quickSetter(targets, 'skewY', 'deg')
+    const clamp = gsap.utils.clamp(-20, 20)
+
+    gsap.set(targets, { transformOrigin: 'right center', force3D: true })
 
     const trigger = ScrollTrigger.create({
       onUpdate: (self) => {
-        let skew = clamp(self.getVelocity() / -300)
+        const skew = clamp(self.getVelocity() / -300)
         if (Math.abs(skew) > Math.abs(proxy.skew)) {
           proxy.skew = skew
           gsap.to(proxy, {
@@ -109,6 +125,7 @@ export default function Shop() {
 
     return () => {
       trigger.kill()
+      gsap.set(targets, { clearProps: 'transform' })
     }
   }, [loading, products])
 
@@ -186,10 +203,12 @@ export default function Shop() {
                 key={p._id || p.slug}
                 data-flip-card
                 data-flip-id={p._id || p.slug}
-                className={`${styles.cell} skewElem`}
+                className={styles.cell}
                 style={{ display: matches(p) ? '' : 'none' }}
               >
-                <ProductCard product={p} onAddToCart={handleAddToCart} />
+                <div className={`${styles.skew} skewElem`}>
+                  <ProductCard product={p} onAddToCart={handleAddToCart} />
+                </div>
               </div>
             ))
         }
