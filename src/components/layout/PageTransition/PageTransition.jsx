@@ -1,4 +1,4 @@
-import { useRef, useEffect, useState } from 'react'
+import { useRef, useEffect, useLayoutEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
@@ -10,6 +10,16 @@ gsap.registerPlugin(ScrollTrigger)
 // Without this, reveal triggers created during the transition keep stale
 // positions and above-the-fold content never auto-reveals until a scroll.
 const refreshTriggers = () => ScrollTrigger.refresh()
+
+// Jump to the top instantly, bypassing the page's `scroll-behavior: smooth`
+// (a smooth scroll would get aborted by the content swap and leave us partway).
+const jumpToTop = () => {
+  const el = document.scrollingElement || document.documentElement
+  const prev = el.style.scrollBehavior
+  el.style.scrollBehavior = 'auto'
+  window.scrollTo(0, 0)
+  el.style.scrollBehavior = prev
+}
 
 // ── Wavy-curtain tuning (forked from Blake Bowen's "shape overlays" pen) ──
 const NUM_POINTS = 10
@@ -26,7 +36,8 @@ export default function PageTransition({ children }) {
   const pathRefs = useRef([])
   const tlRef = useRef(null)
   const isFirstLoad = useRef(true)
-  const pendingReveal = useRef(false) // true only when a cover curtain was played
+  const pendingReveal = useRef(false)   // true only when a cover curtain was played
+  const pendingScrollTop = useRef(false) // true for real (pathname) navigations
   // points[pathIndex][pointIndex] — the y-position of each control point (0–100)
   const allPoints = useRef(
     Array.from({ length: NUM_PATHS }, () => new Array(NUM_POINTS).fill(0))
@@ -97,10 +108,12 @@ export default function PageTransition({ children }) {
       return
     }
 
+    // A real page change — the new page should start at the top.
+    pendingScrollTop.current = true
+
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     if (prefersReducedMotion) {
       setDisplayLocation(location)
-      window.scrollTo(0, 0)
       return
     }
 
@@ -108,10 +121,18 @@ export default function PageTransition({ children }) {
     if (overlayRef.current) overlayRef.current.style.pointerEvents = 'auto'
     animate(true, () => {
       setDisplayLocation(location)
-      window.scrollTo(0, 0)
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location])
+
+  // Reset scroll to the top after the new page content has rendered (before
+  // paint), for real navigations only — not Shop filter/sort search changes.
+  useLayoutEffect(() => {
+    if (pendingScrollTop.current) {
+      pendingScrollTop.current = false
+      jumpToTop()
+    }
+  }, [displayLocation])
 
   // After the content swaps, reveal the new page.
   useEffect(() => {
