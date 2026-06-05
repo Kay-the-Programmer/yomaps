@@ -115,18 +115,6 @@ export default function About() {
         linesClass: 'line'
       })
 
-      // We need to wrap lines manually for the mask effect, or we can just 
-      // animate the lines. The CodePen uses a custom 'mask: "lines"' feature 
-      // which is typically done by wrapping the lines in another overflow:hidden div.
-      // But since we just want the yPercent: 100 reveal, we can do it directly
-      // if the parent container doesn't clip, or we can use the native SplitText feature
-      // if available, but usually we just animate the lines. Wait, SplitText DOES NOT have
-      // a native 'mask: "lines"' property in standard GSAP unless it's a specific version.
-      // Actually, SplitText DOES support wrapping in recent versions, but just to be safe, 
-      // let's wrap lines in overflow hidden divs, or simply do the from animation.
-      // Let's use the provided code:
-      
-      // We will wrap lines so they can be masked
       const lines = splitBio.lines
       lines.forEach(line => {
         const wrapper = document.createElement('div')
@@ -143,10 +131,40 @@ export default function About() {
         opacity: 0,
         stagger: 0.1,
         ease: "expo.out",
-        scrollTrigger: { 
-          trigger: heroRef.current, 
-          start: 'top 85%' 
-        }
+        scrollTrigger: { trigger: heroRef.current, start: 'top 85%' }
+      })
+    }
+
+    // 3D SplitText loop for mission quote
+    if (missionRef.current) {
+      gsap.set(missionRef.current, { visibility: "visible" })
+      const lines = missionRef.current.querySelectorAll(`.${styles.missionLine}`)
+      const splitLines = Array.from(lines).map(line => 
+        new SplitText(line, { type: "chars", charsClass: styles.char })
+      )
+
+      const depth = -60 // Adjust depth for 3D cylinder radius
+      const transformOrigin = `50% 50% ${depth}px`
+
+      gsap.set(lines, { perspective: 800, transformStyle: "preserve-3d" })
+
+      const animTime = 1.2
+      const tl = gsap.timeline({ repeat: -1 })
+
+      splitLines.forEach((split, index) => {
+        tl.fromTo(
+          split.chars,
+          { rotationX: -90, opacity: 0 },
+          { 
+            rotationX: 90, 
+            opacity: 1, // Adding opacity fade for smoother entrance/exit
+            stagger: 0.04, 
+            duration: animTime, 
+            ease: "none", 
+            transformOrigin 
+          },
+          index * 0.6
+        )
       })
     }
 
@@ -220,10 +238,13 @@ export default function About() {
       </section>
 
       <section className={styles.mission}>
-        <div ref={missionRef} className={styles.missionInner}>
-          <p className={styles.missionQuote}>
-            "Every item is a piece of the journey."
-          </p>
+        <div ref={missionRef} className={styles.missionContainer}>
+          <div className={styles.missionTube}>
+            <h1 className={styles.missionLine}>"Every item is a piece of the journey."</h1>
+            <h1 className={styles.missionLine}>"Every item is a piece of the journey."</h1>
+            <h1 className={styles.missionLine}>"Every item is a piece of the journey."</h1>
+            <h1 className={styles.missionLine}>"Every item is a piece of the journey."</h1>
+          </div>
           <p className={styles.missionAttrib}>— Yo Maps</p>
         </div>
       </section>

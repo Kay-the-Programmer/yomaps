@@ -118,14 +118,41 @@
   text-align: center;
 }
 
-.missionInner { display: flex; flex-direction: column; gap: 10px; align-items: center; }
+.missionContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  visibility: hidden; /* GSAP sets to visible */
+  overflow: hidden; /* to prevent scrollbars from 3D swinging */
+  padding: 40px 0;
+}
 
-.missionQuote {
+.missionTube {
+  position: relative;
+  width: 100%;
+  height: clamp(60px, 8vw, 100px); /* Height of the tube */
+  margin-bottom: 20px;
+}
+
+.missionLine {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  line-height: 1;
+  margin: 0;
+  white-space: nowrap;
+  text-align: center;
   font-family: var(--font-display);
   font-size: clamp(28px, 4.5vw, 52px);
   letter-spacing: 0.08em;
   color: var(--color-text);
-  line-height: 1.2;
+}
+
+.missionLine div {
+  backface-visibility: hidden;
 }
 
 .missionAttrib { font-size: 13px; color: var(--color-gold); letter-spacing: 0.1em; }

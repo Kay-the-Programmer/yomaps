@@ -66,7 +66,7 @@ export default function ArtistBanner() {
       <span ref={bgRef} className={styles.bgText} aria-hidden="true">ZAMBIA</span>
       <div className={styles.inner}>
         <p ref={eyebrowRef} className={styles.eyebrow}>
-          Elton Mulenga · Born Kasama · Signed Olios Records
+          Yo Maps 
         </p>
 
         <div ref={statsRef} className={styles.stats}>
