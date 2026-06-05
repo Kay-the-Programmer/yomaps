@@ -240,10 +240,10 @@ export default function About() {
       <section className={styles.mission}>
         <div ref={missionRef} className={styles.missionContainer}>
           <div className={styles.missionTube}>
-            <h1 className={styles.missionLine}>"Every item is a piece of the journey."</h1>
-            <h1 className={styles.missionLine}>"Every item is a piece of the journey."</h1>
-            <h1 className={styles.missionLine}>"Every item is a piece of the journey."</h1>
-            <h1 className={styles.missionLine}>"Every item is a piece of the journey."</h1>
+            <h1 className={styles.missionLine}>"Try Again..."</h1>
+            <h1 className={styles.missionLine}>"Try Again..."</h1>
+            <h1 className={styles.missionLine}>"Try Again..."</h1>
+            <h1 className={styles.missionLine}>"Try Again..."</h1>
           </div>
           <p className={styles.missionAttrib}>— Yo Maps</p>
         </div>
