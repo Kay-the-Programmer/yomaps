@@ -28,18 +28,20 @@ function StorefrontLayout() {
       <div className="cursor" aria-hidden="true" />
       <Navbar />
       <PageTransition>
-        <Routes>
-          <Route path="/"                    element={<Home />} />
-          <Route path="/shop"                element={<Shop />} />
-          <Route path="/shop/:category"      element={<Category />} />
-          <Route path="/product/:slug"       element={<Product />} />
-          <Route path="/cart"                element={<Cart />} />
-          <Route path="/checkout"            element={<Checkout />} />
-          <Route path="/order-confirmed/:id" element={<OrderConfirmed />} />
-          <Route path="/about"               element={<About />} />
-          <Route path="/contact"             element={<Contact />} />
-          <Route path="/faq"                 element={<FAQ />} />
-        </Routes>
+        {(displayLocation) => (
+          <Routes location={displayLocation}>
+            <Route path="/"                    element={<Home />} />
+            <Route path="/shop"                element={<Shop />} />
+            <Route path="/shop/:category"      element={<Category />} />
+            <Route path="/product/:slug"       element={<Product />} />
+            <Route path="/cart"                element={<Cart />} />
+            <Route path="/checkout"            element={<Checkout />} />
+            <Route path="/order-confirmed/:id" element={<OrderConfirmed />} />
+            <Route path="/about"               element={<About />} />
+            <Route path="/contact"             element={<Contact />} />
+            <Route path="/faq"                 element={<FAQ />} />
+          </Routes>
+        )}
       </PageTransition>
       <Footer />
       <ToastRegion />

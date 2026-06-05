@@ -1,22 +1,55 @@
 import { gsap } from 'gsap'
+import { MorphSVGPlugin } from 'gsap/MorphSVGPlugin'
+import { SplitText } from 'gsap/SplitText'
+
+gsap.registerPlugin(MorphSVGPlugin, SplitText)
 
 /**
  * Cinematic hero entrance for the image-background layout: a slow photo zoom,
- * scrim fade, and a masked, bottom-up reveal of the overlay copy. Returns the
- * timeline.
+ * scrim fade, and a MorphSVG headline where each letter of "WEAR THE VIBE"
+ * coalesces from a geometric shape (triangle / square / circle) into its final
+ * glyph. Each `.hero-letter` path carries its starting shape in `data-from`.
+ * The subline is split into words that tumble in with a random rotation.
+ *
+ * Returns `{ tl, split }`; call `split.revert()` on cleanup to restore the
+ * subline's original markup.
  */
 export const heroEntrance = () => {
   const tl = gsap.timeline({ defaults: { ease: 'power3.out' } })
 
+  // Split the subline into individual words for the tumble-in effect.
+  const sublineEl = document.querySelector('.hero-subline')
+  const split = sublineEl
+    ? SplitText.create(sublineEl, { type: 'words', wordsClass: 'hero-subword' })
+    : null
+
   tl.from('.hero-img',   { scale: 1.18, duration: 1.8, ease: 'power2.out' }, 0)
     .from('.hero-scrim', { opacity: 0, duration: 1.2, ease: 'power1.out' }, 0)
-    .from('.hero-eyebrow', { opacity: 0, y: 20, duration: 0.7 }, 0.35)
-    .from('.hero-line-inner', { yPercent: 120, duration: 0.95, stagger: 0.09 }, 0.5)
-    .from('.hero-subline', { opacity: 0, y: 20, duration: 0.7 }, '-=0.5')
-    .from('.hero-ctas > *', { opacity: 0, y: 16, duration: 0.6, stagger: 0.1 }, '-=0.45')
+    .from('.hero-letter', {
+      morphSVG: (i, el) => el.getAttribute('data-from'),
+      opacity: 0,
+      scale: 0.6,
+      transformOrigin: '50% 50%',
+      duration: 1.0,
+      stagger: 0.08,
+      ease: 'power2.inOut'
+    }, 0.45)
+
+  if (split) {
+    tl.from(split.words, {
+      y: -100,
+      opacity: 0,
+      rotation: 'random(-80, 80)',
+      stagger: 0.1,
+      duration: 1,
+      ease: 'back'
+    }, '-=0.5')
+  }
+
+  tl.from('.hero-ctas > *', { opacity: 0, y: 16, duration: 0.6, stagger: 0.1 }, '-=0.45')
     .from('.hero-cue', { opacity: 0, y: -10, duration: 0.6 }, '-=0.3')
 
-  return tl
+  return { tl, split }
 }
 
 /**

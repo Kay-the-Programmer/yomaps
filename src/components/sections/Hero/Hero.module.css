@@ -72,33 +72,35 @@
 }
 
 .headline {
-  font-family: var(--font-display);
-  font-size: clamp(58px, 11vw, 132px);
-  letter-spacing: 0.08em;
-  line-height: 0.92;
-  color: rgb(var(--hero-text-rgb));
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 0 0.32em;
-  text-shadow: var(--hero-headline-shadow);
-  transition: color var(--transition-base), text-shadow var(--transition-base);
+  width: 100%;
+  max-width: 760px;
+  margin: 0;
+  line-height: 0;
 }
 
-.wordMask {
-  display: inline-block;
+.headlineSvg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+  filter: var(--hero-headline-shadow-filter, drop-shadow(0 6px 20px rgba(0, 0, 0, 0.45)));
+}
+
+.headlineSvg .hero-letter {
+  will-change: transform, opacity;
+}
+
+/* Visually-hidden copy of the headline text for screen readers / SEO. */
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
   overflow: hidden;
-  vertical-align: top;
-  padding-bottom: 0.08em;
-}
-
-.word {
-  display: inline-block;
-  will-change: transform;
-}
-
-.accent {
-  color: var(--color-gold);
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 .subline {
