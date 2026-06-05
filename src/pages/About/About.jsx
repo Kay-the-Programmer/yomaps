@@ -121,6 +121,13 @@ export default function About() {
         <meta name="description" content="The story of Elton Mulenga, Zambia's most-streamed artist and 2025 AFRIMA Award winner." />
       </Helmet>
 
+      <section ref={heroRef} className={styles.hero}>
+        <div className={styles.heroText}>
+          <p className={styles.eyebrow}>Elton Mulenga</p>
+          <h1 className={styles.title}>The Artist<br />Behind the Vibe</h1>
+        </div>
+      </section>
+
       <div ref={galleryWrapRef} className={styles.galleryWrap}>
         <div className={`${styles.gallery} ${styles.galleryBento}`} id="gallery-8">
           {GALLERY_IMAGES.map((src, i) => (
@@ -133,8 +140,6 @@ export default function About() {
 
       <section ref={heroRef} className={styles.hero}>
         <div className={styles.heroText}>
-          <p className={styles.eyebrow}>Elton Mulenga · Kasama, Zambia</p>
-          <h1 className={styles.title}>The Artist<br />Behind the Vibe</h1>
           <p className={styles.bio}>
             Born in Kasama and raised on Zambian music, Elton Mulenga — known to the continent as Yo Maps —
             built his career song by song, stadium by stadium. Signed to Olios Records, his sound blends
