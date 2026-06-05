@@ -107,10 +107,47 @@ export default function About() {
 
     // Entrance animation for bottom bio
     if (heroRef.current) {
-      gsap.fromTo(heroRef.current.querySelectorAll('p'),
-        { opacity: 0, y: 32 },
-        { opacity: 1, y: 0, duration: 0.7, ease: 'power3.out', scrollTrigger: { trigger: heroRef.current, start: 'top 85%' } }
-      )
+      const bioText = heroRef.current.querySelector('p')
+      gsap.set(bioText, { opacity: 1 })
+      
+      const splitBio = new SplitText(bioText, {
+        type: 'words,lines',
+        linesClass: 'line'
+      })
+
+      // We need to wrap lines manually for the mask effect, or we can just 
+      // animate the lines. The CodePen uses a custom 'mask: "lines"' feature 
+      // which is typically done by wrapping the lines in another overflow:hidden div.
+      // But since we just want the yPercent: 100 reveal, we can do it directly
+      // if the parent container doesn't clip, or we can use the native SplitText feature
+      // if available, but usually we just animate the lines. Wait, SplitText DOES NOT have
+      // a native 'mask: "lines"' property in standard GSAP unless it's a specific version.
+      // Actually, SplitText DOES support wrapping in recent versions, but just to be safe, 
+      // let's wrap lines in overflow hidden divs, or simply do the from animation.
+      // Let's use the provided code:
+      
+      // We will wrap lines so they can be masked
+      const lines = splitBio.lines
+      lines.forEach(line => {
+        const wrapper = document.createElement('div')
+        wrapper.style.overflow = 'hidden'
+        wrapper.style.verticalAlign = 'top'
+        wrapper.style.display = 'inline-block'
+        line.parentNode.insertBefore(wrapper, line)
+        wrapper.appendChild(line)
+      })
+
+      gsap.from(lines, {
+        duration: 0.6,
+        yPercent: 100,
+        opacity: 0,
+        stagger: 0.1,
+        ease: "expo.out",
+        scrollTrigger: { 
+          trigger: heroRef.current, 
+          start: 'top 85%' 
+        }
+      })
     }
 
     return () => window.removeEventListener("resize", createTween)
@@ -158,7 +195,7 @@ export default function About() {
 
       <section ref={heroRef} className={styles.hero}>
         <div className={styles.heroText}>
-          <p className={styles.bio}>
+          <p className={styles.bio} style={{ opacity: 0 }}>
             Born in Kasama and raised on Zambian music, Elton Mulenga — known to the continent as Yo Maps —
             built his career song by song, stadium by stadium. Signed to Olios Records, his sound blends
             Afropop, R&B, and Zambian soul into something that crosses every border.
