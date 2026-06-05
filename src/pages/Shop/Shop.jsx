@@ -1,7 +1,6 @@
-import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { gsap } from 'gsap'
-import { Flip } from 'gsap/Flip'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { useGSAP } from '@gsap/react'
 import { Helmet } from 'react-helmet-async'
@@ -12,7 +11,7 @@ import ProductCard from '../../components/ui/ProductCard/ProductCard'
 import SkeletonCard from '../../components/ui/SkeletonCard/SkeletonCard'
 import styles from './Shop.module.css'
 
-gsap.registerPlugin(Flip, ScrollTrigger, useGSAP)
+gsap.registerPlugin(ScrollTrigger, useGSAP)
 
 const CATEGORIES = ['apparel', 'headwear', 'accessories', 'lifestyle']
 const SORTS = [
@@ -27,15 +26,14 @@ export default function Shop() {
   const [products, setProducts] = useState([])
   const [loading, setLoading] = useState(true)
   const gridRef = useRef(null)
-  const flipState = useRef(null)
   const { addItem } = useCartStore()
   const { addToast } = useToastStore()
 
   const category = searchParams.get('category') || 'all'
   const sort = searchParams.get('sort') || 'newest'
 
-  // Fetch the full catalogue for the current sort. Category filtering happens
-  // client-side so Flip can animate the grid reflow.
+  // Fetch the full catalogue for the current sort; category filtering is
+  // client-side (cheap, and lets the grid re-render instantly).
   useEffect(() => {
     setLoading(true)
     getProducts({ sort, limit: 100 })
@@ -44,58 +42,22 @@ export default function Shop() {
       .finally(() => setLoading(false))
   }, [sort])
 
-  const matches = (p) => category === 'all' || p.category === category
-  const visibleCount = products.filter(matches).length
+  // Only the matching products are rendered. Toggling `display` on hidden cells
+  // underneath a Flip animation used to race with React and scatter the grid;
+  // rendering just the visible set keeps the layout deterministic.
+  const visibleProducts = category === 'all'
+    ? products
+    : products.filter((p) => p.category === category)
 
-  // Entrance fade for freshly fetched products (initial load / sort change).
-  // overwrite:'auto' lets a re-run cleanly replace any in-flight tween on these
-  // cards; onComplete clears the inline props so nothing is left frozen.
-  useEffect(() => {
-    if (loading || products.length === 0 || !gridRef.current) return
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+  // Cards reveal via a pure-CSS keyframe (see .cell in Shop.module.css), staggered
+  // by the --i index set in the render. CSS can't be interrupted by the Flip/skew
+  // GSAP calls the way a JS tween could, so cards always settle fully visible.
 
-    const cards = gridRef.current.querySelectorAll(':scope > [data-flip-card]')
-    if (!cards.length) return
-
-    gsap.fromTo(
-      cards,
-      { opacity: 0, y: 30 },
-      {
-        opacity: 1,
-        y: 0,
-        duration: 0.5,
-        stagger: 0.06,
-        ease: 'power3.out',
-        overwrite: 'auto',
-        clearProps: 'opacity,transform'
-      }
-    )
-  }, [loading, products])
-
-  // Flip the grid whenever the category filter changes.
-  useLayoutEffect(() => {
-    const state = flipState.current
-    if (!state) return
-    flipState.current = null
-
-    Flip.from(state, {
-      duration: 0.7,
-      scale: true,
-      ease: 'power1.inOut',
-      stagger: 0.05,
-      absolute: true,
-      onEnter: (els) =>
-        gsap.fromTo(els, { opacity: 0, scale: 0 }, { opacity: 1, scale: 1, duration: 0.6 }),
-      onLeave: (els) => gsap.to(els, { opacity: 0, scale: 0, duration: 0.6 })
-    })
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [category])
-
-  // Velocity-based skew on scroll. Scoped to this page's grid and applied to the
-  // dedicated .skewElem inner wrappers (NOT the flip cells) so it never competes
-  // with the Flip filter animation or the entrance tween over the same transform.
+  // Velocity-based skew on scroll, applied to the dedicated .skewElem inner
+  // wrappers (never the cards themselves, so it can't fight the entrance tween).
+  // Re-runs when the rendered set changes so it always targets live elements.
   useGSAP(() => {
-    if (loading || products.length === 0) return
+    if (loading || visibleProducts.length === 0) return
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
 
     const targets = gridRef.current?.querySelectorAll('.skewElem')
@@ -103,7 +65,7 @@ export default function Shop() {
 
     const proxy = { skew: 0 }
     const skewSetter = gsap.quickSetter(targets, 'skewY', 'deg')
-    const clamp = gsap.utils.clamp(-20, 20)
+    const clamp = gsap.utils.clamp(-12, 12)
 
     gsap.set(targets, { transformOrigin: 'right center', force3D: true })
 
@@ -127,17 +89,10 @@ export default function Shop() {
       trigger.kill()
       gsap.set(targets, { clearProps: 'transform' })
     }
-  }, [loading, products])
+  }, [loading, products, category])
 
   const setFilter = (cat) => {
     if (cat === category) return
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    if (!prefersReducedMotion && gridRef.current) {
-      flipState.current = Flip.getState(
-        gridRef.current.querySelectorAll(':scope > [data-flip-card]'),
-        { props: 'opacity' }
-      )
-    }
     const p = new URLSearchParams(searchParams)
     if (cat === 'all') p.delete('category')
     else p.set('category', cat)
@@ -198,13 +153,12 @@ export default function Shop() {
       <div ref={gridRef} className={styles.grid}>
         {loading
           ? Array.from({ length: 8 }).map((_, i) => <SkeletonCard key={i} />)
-          : products.map((p) => (
+          : visibleProducts.map((p, i) => (
               <div
                 key={p._id || p.slug}
-                data-flip-card
-                data-flip-id={p._id || p.slug}
+                data-card
                 className={styles.cell}
-                style={{ display: matches(p) ? '' : 'none' }}
+                style={{ '--i': i }}
               >
                 <div className={`${styles.skew} skewElem`}>
                   <ProductCard product={p} onAddToCart={handleAddToCart} />
@@ -212,7 +166,7 @@ export default function Shop() {
               </div>
             ))
         }
-        {!loading && visibleCount === 0 && (
+        {!loading && visibleProducts.length === 0 && (
           <p className={styles.empty}>No products found.</p>
         )}
       </div>

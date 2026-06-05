@@ -82,23 +82,31 @@
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 16px;
-  /* Positioning context so Flip's `absolute: true` anchors cells to the grid
-     (not the page) while it animates the filter reflow. */
-  position: relative;
 }
 
-/* Flip filter cell — wraps each card so its display can toggle and Flip can
-   measure/animate it. min-width:0 prevents grid blowout. */
+/* Each card reveals with a CSS keyframe, staggered by its --i index. Using CSS
+   (not a JS tween) means the Flip-free filter re-render can't leave a card
+   frozen mid-fade — they always settle fully visible. */
 .cell {
   min-width: 0;
-  will-change: transform, opacity;
+  animation: cardIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: calc(var(--i, 0) * 0.05s);
+}
+
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 /* Inner wrapper that carries the velocity-skew transform, kept separate from
-   the cell so the skew never collides with the Flip / entrance animations. */
+   the cell so the skew never collides with the card reveal. */
 .skew {
   height: 100%;
   will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cell { animation: none; }
 }
 
 .empty {
