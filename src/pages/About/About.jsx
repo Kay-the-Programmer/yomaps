@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { gsap } from 'gsap'
 import { Flip } from 'gsap/Flip'
+import { SplitText } from 'gsap/SplitText'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { useGSAP } from '@gsap/react'
 import { Helmet } from 'react-helmet-async'
@@ -15,7 +16,7 @@ import img6 from '../../../assets/images/about/y-record.jpg'
 import img8 from '../../../assets/images/about/yomaps1.jpg'
 import styles from './About.module.css'
 
-gsap.registerPlugin(ScrollTrigger, Flip, useGSAP)
+gsap.registerPlugin(ScrollTrigger, Flip, SplitText, useGSAP)
 
 const GALLERY_IMAGES = [img1, img2, img3, img4, img5, img6, heroImage, img8]
 
@@ -31,6 +32,7 @@ const TIMELINE = [
 ]
 
 export default function About() {
+  const headerRef = useRef(null)
   const heroRef = useRef(null)
   const timelineRef = useRef(null)
   const galleryWrapRef = useRef(null)
@@ -75,28 +77,44 @@ export default function About() {
 
     createTween()
     window.addEventListener("resize", createTween)
-    return () => window.removeEventListener("resize", createTween)
-  }, { scope: galleryWrapRef })
 
-  useEffect(() => {
-    if (!heroRef.current) return
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    if (prefersReducedMotion) return
-    const ctx = gsap.context(() => {
-      gsap.fromTo(heroRef.current.querySelectorAll('h1, p'),
-        { opacity: 0, y: 32 },
-        { opacity: 1, y: 0, duration: 0.7, stagger: 0.12, ease: 'power3.out', delay: 0.2 }
+    // Entrance animation for header
+    if (headerRef.current) {
+      const title = headerRef.current.querySelector('h1')
+      const eyebrow = headerRef.current.querySelector('p')
+      
+      gsap.fromTo(eyebrow, 
+        { opacity: 0, y: 20 },
+        { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out', delay: 0.1 }
       )
-      const img = heroRef.current.querySelector('img')
-      if (img) {
-        gsap.fromTo(img,
-          { opacity: 0, scale: 1.08 },
-          { opacity: 1, scale: 1, duration: 1.1, ease: 'power3.out', delay: 0.15 }
-        )
-      }
-    })
-    return () => ctx.revert()
-  }, [])
+
+      gsap.set(title, { opacity: 1 })
+      const split = new SplitText(title, { type: 'chars, words', charsClass: 'char' })
+      
+      gsap.from(split.chars, {
+        duration: 1,
+        opacity: 0,
+        scale: 0,
+        y: 80,
+        rotationX: 180,
+        transformOrigin: "0% 50% -50",
+        ease: "back",
+        stagger: 0.05,
+        delay: 0.2,
+        onComplete: () => split.revert()
+      })
+    }
+
+    // Entrance animation for bottom bio
+    if (heroRef.current) {
+      gsap.fromTo(heroRef.current.querySelectorAll('p'),
+        { opacity: 0, y: 32 },
+        { opacity: 1, y: 0, duration: 0.7, ease: 'power3.out', scrollTrigger: { trigger: heroRef.current, start: 'top 85%' } }
+      )
+    }
+
+    return () => window.removeEventListener("resize", createTween)
+  })
 
   useEffect(() => {
     if (!timelineRef.current) return
@@ -121,10 +139,10 @@ export default function About() {
         <meta name="description" content="The story of Elton Mulenga, Zambia's most-streamed artist and 2025 AFRIMA Award winner." />
       </Helmet>
 
-      <section ref={heroRef} className={styles.hero}>
+      <section ref={headerRef} className={styles.hero}>
         <div className={styles.heroText}>
           <p className={styles.eyebrow}>Elton Mulenga</p>
-          <h1 className={styles.title}>The Artist<br />Behind the Vibe</h1>
+          <h1 className={styles.title} style={{ opacity: 0 }}>The Artist<br />Behind the Vibe</h1>
         </div>
       </section>
 
