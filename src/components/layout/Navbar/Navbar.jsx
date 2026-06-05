@@ -7,6 +7,8 @@ import { useCartStore } from '../../../store/cartStore'
 import { cartPulse } from '../../../animations/cartAnimations'
 import styles from './Navbar.module.css'
 
+gsap.registerPlugin(ScrollTrigger)
+
 const NAV_LINKS = [
   { to: '/shop',    label: 'Shop' },
   { to: '/about',   label: 'About' },
