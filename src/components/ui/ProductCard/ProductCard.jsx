@@ -1,11 +1,14 @@
 import { useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { gsap } from 'gsap'
+import { TextPlugin } from 'gsap/TextPlugin'
 import Badge from '../Badge/Badge'
 import ProductSVG from '../ProductSVG/ProductSVG'
 import ProgressiveImage from '../ProgressiveImage/ProgressiveImage'
 import { getCategoryLabel, imageUrl } from '../../../lib/utils'
 import styles from './ProductCard.module.css'
+
+gsap.registerPlugin(TextPlugin)
 
 export default function ProductCard({ product, onAddToCart }) {
   const cardRef = useRef(null)
@@ -35,6 +38,29 @@ export default function ProductCard({ product, onAddToCart }) {
 
   const handleAddToCart = (e) => {
     e.stopPropagation()
+    const btn = addBtnRef.current
+
+    if (btn && !btn.dataset.animating) {
+      btn.dataset.animating = 'true'
+      const originalText = btn.innerText
+      
+      const tl = gsap.timeline({
+        onComplete: () => {
+          gsap.delayedCall(1.2, () => {
+            gsap.to(btn, { 
+              text: originalText, 
+              duration: 0.3, 
+              onComplete: () => { delete btn.dataset.animating } 
+            })
+          })
+        }
+      })
+      
+      tl.to(btn, { duration: 0.6, text: { value: 'Adding...', type: 'diff' }, ease: 'sine.in' })
+        .to(btn, { duration: 0.3, text: { value: 'Adding', type: 'diff' }, ease: 'sine.inOut', repeat: 2, yoyo: true })
+        .to(btn, { duration: 0.2, text: 'Added!', ease: 'none' }, "+=0.1")
+    }
+
     onAddToCart(product)
   }
 

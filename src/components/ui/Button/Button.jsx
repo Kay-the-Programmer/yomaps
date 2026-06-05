@@ -1,6 +1,7 @@
+import { forwardRef } from 'react'
 import styles from './Button.module.css'
 
-export default function Button({
+const Button = forwardRef(({
   variant = 'primary',
   size = 'md',
   children,
@@ -9,9 +10,10 @@ export default function Button({
   type = 'button',
   className = '',
   ...rest
-}) {
+}, ref) => {
   return (
     <button
+      ref={ref}
       type={type}
       className={`${styles.btn} ${styles[variant]} ${styles[size]} ${className}`}
       onClick={onClick}
@@ -21,4 +23,6 @@ export default function Button({
       {children}
     </button>
   )
-}
+})
+
+export default Button

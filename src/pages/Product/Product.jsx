@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { gsap } from 'gsap'
+import { TextPlugin } from 'gsap/TextPlugin'
 import { Helmet } from 'react-helmet-async'
 import { getProduct } from '../../lib/api'
 import { useCartStore, useToastStore } from '../../store/cartStore'
@@ -12,6 +13,8 @@ import Button from '../../components/ui/Button/Button'
 import ProductCard from '../../components/ui/ProductCard/ProductCard'
 import { getCategoryLabel, imageUrl } from '../../lib/utils'
 import styles from './Product.module.css'
+
+gsap.registerPlugin(TextPlugin)
 
 export default function Product() {
   const { slug } = useParams()
@@ -26,6 +29,7 @@ export default function Product() {
   const imageRef = useRef(null)
   const contentRef = useRef(null)
   const relatedRef = useRef(null)
+  const addToCartBtnRef = useRef(null)
   const { addItem } = useCartStore()
   const { addToast } = useToastStore()
 
@@ -86,6 +90,29 @@ export default function Product() {
       return
     }
     setSizeError(false)
+
+    const btn = addToCartBtnRef.current
+    if (btn && !btn.dataset.animating) {
+      btn.dataset.animating = 'true'
+      const originalText = btn.innerText
+      
+      const tl = gsap.timeline({
+        onComplete: () => {
+          gsap.delayedCall(1.2, () => {
+            gsap.to(btn, { 
+              text: originalText, 
+              duration: 0.3, 
+              onComplete: () => { delete btn.dataset.animating } 
+            })
+          })
+        }
+      })
+      
+      tl.to(btn, { duration: 0.6, text: { value: 'Adding...', type: 'diff' }, ease: 'sine.in' })
+        .to(btn, { duration: 0.3, text: { value: 'Adding', type: 'diff' }, ease: 'sine.inOut', repeat: 2, yoyo: true })
+        .to(btn, { duration: 0.2, text: 'Added!', ease: 'none' }, "+=0.1")
+    }
+
     addItem(product, selectedSize, quantity)
     addToast(`${product.name} added to cart`)
   }
@@ -200,7 +227,7 @@ export default function Product() {
           </div>
 
           <div className={styles.actions} data-anim>
-            <Button variant="primary" size="lg" onClick={handleAddToCart} style={{ flex: 1 }}>
+            <Button ref={addToCartBtnRef} variant="primary" size="lg" onClick={handleAddToCart} style={{ flex: 1 }}>
               Add to Cart
             </Button>
             <Button
