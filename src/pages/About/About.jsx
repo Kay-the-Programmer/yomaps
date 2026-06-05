@@ -1,9 +1,23 @@
 import { useEffect, useRef } from 'react'
 import { gsap } from 'gsap'
+import { Flip } from 'gsap/Flip'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { useGSAP } from '@gsap/react'
 import { Helmet } from 'react-helmet-async'
 import { useGsapReveal } from '../../hooks/useGsapReveal'
 import heroImage from '../../../assets/images/about/yo-mpas-about.jpg'
+import img1 from '../../../assets/images/about/y-a.jpg'
+import img2 from '../../../assets/images/about/y-a1.jpg'
+import img3 from '../../../assets/images/about/y-a2.jpg'
+import img4 from '../../../assets/images/about/y-a3.jpg'
+import img5 from '../../../assets/images/about/y-a5.jpg'
+import img6 from '../../../assets/images/about/y-record.jpg'
+import img8 from '../../../assets/images/about/yomaps1.jpg'
 import styles from './About.module.css'
+
+gsap.registerPlugin(ScrollTrigger, Flip, useGSAP)
+
+const GALLERY_IMAGES = [img1, img2, img3, img4, img5, img6, heroImage, img8]
 
 const TIMELINE = [
   { year: '2016', event: 'First single "Njikata Kuboko" released — Zambia takes notice' },
@@ -19,7 +33,50 @@ const TIMELINE = [
 export default function About() {
   const heroRef = useRef(null)
   const timelineRef = useRef(null)
+  const galleryWrapRef = useRef(null)
   const missionRef = useGsapReveal({ delay: 0.1 })
+
+  useGSAP(() => {
+    if (!galleryWrapRef.current) return
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    if (prefersReducedMotion) return
+
+    let flipCtx
+    const galleryElement = galleryWrapRef.current.querySelector(`.${styles.gallery}`)
+    const galleryItems = galleryElement.querySelectorAll(`.${styles.galleryItem}`)
+
+    const createTween = () => {
+      if (flipCtx) flipCtx.revert()
+      galleryElement.classList.remove(styles.galleryFinal)
+
+      flipCtx = gsap.context(() => {
+        galleryElement.classList.add(styles.galleryFinal)
+        const flipState = Flip.getState(galleryItems)
+        galleryElement.classList.remove(styles.galleryFinal)
+
+        const flip = Flip.to(flipState, {
+          simple: true,
+          ease: "expoScale(1, 5)"
+        })
+
+        const tl = gsap.timeline({
+          scrollTrigger: {
+            trigger: galleryElement,
+            start: "center center",
+            end: "+=100%",
+            scrub: true,
+            pin: galleryWrapRef.current
+          }
+        })
+        tl.add(flip)
+        return () => gsap.set(galleryItems, { clearProps: "all" })
+      })
+    }
+
+    createTween()
+    window.addEventListener("resize", createTween)
+    return () => window.removeEventListener("resize", createTween)
+  }, { scope: galleryWrapRef })
 
   useEffect(() => {
     if (!heroRef.current) return
@@ -64,6 +121,16 @@ export default function About() {
         <meta name="description" content="The story of Elton Mulenga, Zambia's most-streamed artist and 2025 AFRIMA Award winner." />
       </Helmet>
 
+      <div ref={galleryWrapRef} className={styles.galleryWrap}>
+        <div className={`${styles.gallery} ${styles.galleryBento}`} id="gallery-8">
+          {GALLERY_IMAGES.map((src, i) => (
+            <div key={i} className={styles.galleryItem}>
+              <img src={src} alt="" />
+            </div>
+          ))}
+        </div>
+      </div>
+
       <section ref={heroRef} className={styles.hero}>
         <div className={styles.heroText}>
           <p className={styles.eyebrow}>Elton Mulenga · Kasama, Zambia</p>
@@ -75,9 +142,6 @@ export default function About() {
             The numbers confirm what fans already knew: 100 million streams, a Heroes Stadium sellout,
             and the 2025 AFRIMA for Best Male Artist in Southern Africa.
           </p>
-        </div>
-        <div className={styles.heroImageWrap}>
-          <img className={styles.heroImage} src={heroImage} alt="Yo Maps — Elton Mulenga" />
         </div>
       </section>
 
