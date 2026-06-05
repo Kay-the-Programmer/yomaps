@@ -23,12 +23,12 @@ const GALLERY_IMAGES = [img1, img2, img3, img4, img5, img6, heroImage, img8]
 const TIMELINE = [
   { year: '2016', event: 'First single "Njikata Kuboko" released — Zambia takes notice' },
   { year: '2018', event: '"Finally" ft. Macky 2 breaks through, earning national airplay' },
-  { year: '2019', event: 'Komando album drops — establishes Yo Maps as a headliner' },
-  { year: '2021', event: 'My Hero album released, featuring "Mr Romantic"' },
+  { year: '2021', event: 'Komando album drops — establishes Yo Maps as a headliner' },
   { year: '2022', event: '"Mr Romantic" crosses 100M+ streams on Boomplay — first Zambian in the Golden Club' },
-  { year: '2023', event: 'Sells out Heroes Stadium, Lusaka — 50,000 fans' },
+  { year: '2023', event: 'Try Again album launch — fills Heroes Stadium (50,000 + fans)' },
+  { year: '2024', event: 'My Hero album released' },
   { year: '2025', event: 'AFRIMA Award — Best Male Artist in Southern Africa' },
-  { year: '2025', event: 'Vibes on Vibes album with Makhadzi, Harmonize, and Rotimi' }
+  { year: '2026', event: 'Vibes on Vibes album with Makhadzi, Harmonize, and Rotimi' }
 ]
 
 export default function About() {
