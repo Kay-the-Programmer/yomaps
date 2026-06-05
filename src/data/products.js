@@ -56,6 +56,7 @@ const LQIP = {
 }
 
 const raw = [
+  { slug:'maps-signature-snapback', name:'Maps Signature Snapback', category:'headwear', price_zmw:180, price_usd:9, description:'Six-panel snapback. Embroidered gold YM logo. One size fits all.', sizes:null, tags:['best-seller'], album:null, in_stock:true, stock_count:90 },
   // APPAREL
   { slug:'vibes-on-vibes-tee', name:'Vibes on Vibes Tee', category:'apparel', price_zmw:250, price_usd:13, description:'Drop-shoulder tee from the Vibes on Vibes album era. 100% heavyweight cotton. Gold YM monogram print.', sizes:['S','M','L','XL','XXL'], tags:['new'], album:'Vibes on Vibes', in_stock:true, stock_count:80 },
   { slug:'finally-anniversary-tee', name:'Finally Anniversary Tee', category:'apparel', price_zmw:230, price_usd:12, description:'Celebrating the song that started it all. Limited anniversary reprint.', sizes:['S','M','L','XL','XXL'], tags:['best-seller'], album:'Finally', in_stock:true, stock_count:60 },
@@ -64,7 +65,6 @@ const raw = [
   { slug:'komando-hoodie', name:'Komando Heavyweight Hoodie', category:'apparel', price_zmw:450, price_usd:23, description:'Inspired by the debut album. 400gsm fleece. Embroidered logo.', sizes:['S','M','L','XL','XXL'], tags:[], album:'Komando', in_stock:true, stock_count:35 },
   { slug:'yo-maps-zip-jacket', name:'Yo Maps Zip-Up Jacket', category:'apparel', price_zmw:550, price_usd:28, description:'Full-zip track jacket. Gold zipper, contrast YM side stripe.', sizes:['S','M','L','XL','XXL'], tags:['new'], album:null, in_stock:true, stock_count:30 },
   // HEADWEAR
-  { slug:'maps-signature-snapback', name:'Maps Signature Snapback', category:'headwear', price_zmw:180, price_usd:9, description:'Six-panel snapback. Embroidered gold YM logo. One size fits all.', sizes:null, tags:['best-seller'], album:null, in_stock:true, stock_count:90 },
   { slug:'olios-dad-cap', name:'Olios Records Dad Cap', category:'headwear', price_zmw:160, price_usd:8, description:'Unstructured low-profile cap. Washed cotton. Adjustable strap.', sizes:null, tags:[], album:'Olios Records', in_stock:true, stock_count:70 },
   { slug:'vibes-bucket-hat', name:'Vibes on Vibes Bucket Hat', category:'headwear', price_zmw:190, price_usd:10, description:'Double-sided bucket hat. Vibes on Vibes text on one side, YM monogram reverse.', sizes:null, tags:['new'], album:'Vibes on Vibes', in_stock:true, stock_count:50 },
   { slug:'ym-beanie', name:'YM Logo Beanie', category:'headwear', price_zmw:150, price_usd:8, description:'Slouch-fit ribbed knit beanie. Embroidered YM. Zambia-ready warmth.', sizes:null, tags:[], album:null, in_stock:true, stock_count:60 },
