@@ -10,11 +10,12 @@
   align-items: center;
   justify-content: space-between;
   background: transparent;
-  transition: background var(--transition-base), border-color var(--transition-base);
+  transition: height 0.4s ease, background var(--transition-base), border-color var(--transition-base);
   border-bottom: 0.5px solid transparent;
 }
 
 .scrolled {
+  height: 48px;
   background: var(--color-bg-translucent);
   border-bottom-color: var(--color-border);
   backdrop-filter: blur(12px);

@@ -16,6 +16,7 @@ const NAV_LINKS = [
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
+  const navRef       = useRef(null)
   const cartIconRef  = useRef(null)
   const menuRef      = useRef(null)
   const bar1Ref      = useRef(null)
@@ -23,14 +24,37 @@ export default function Navbar() {
   const bar3Ref      = useRef(null)
   const count = useCartStore((s) => s.getCount())
 
-  // Navbar scroll solid bg
+  // Navbar scroll solid bg and show/hide on scroll
   useEffect(() => {
-    const st = ScrollTrigger.create({
+    if (!navRef.current) return
+
+    const stSolid = ScrollTrigger.create({
       start:       'top -80px',
       onEnter:     () => setScrolled(true),
       onLeaveBack: () => setScrolled(false)
     })
-    return () => st.kill()
+
+    const showAnim = gsap.fromTo(navRef.current,
+      { yPercent: -100 },
+      { yPercent: 0, paused: true, duration: 0.2, ease: 'power2.out' }
+    ).progress(1)
+
+    const stHide = ScrollTrigger.create({
+      start: 'top top',
+      end: 'max',
+      onUpdate: (self) => {
+        if (self.scrollY > 80) {
+          self.direction === -1 ? showAnim.play() : showAnim.reverse()
+        } else {
+          showAnim.play()
+        }
+      }
+    })
+
+    return () => {
+      stSolid.kill()
+      stHide.kill()
+    }
   }, [])
 
   // Cart icon pulse
@@ -98,7 +122,7 @@ export default function Navbar() {
 
   return (
     <>
-      <nav className={`navbar ${styles.navbar} ${scrolled ? styles.scrolled : ''}`}>
+      <nav ref={navRef} className={`${styles.navbar} ${scrolled ? styles.scrolled : ''}`}>
         <Link to="/" className={styles.brand} onClick={closeMenu}>
           YO <span>MAPS</span>
         </Link>
