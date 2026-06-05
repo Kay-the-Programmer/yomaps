@@ -84,6 +84,13 @@
   gap: 16px;
 }
 
+/* Flip filter cell — wraps each card so its display can toggle and Flip can
+   measure/animate it. min-width:0 prevents grid blowout. */
+.cell {
+  min-width: 0;
+  will-change: transform, opacity;
+}
+
 .empty {
   grid-column: 1 / -1;
   text-align: center;

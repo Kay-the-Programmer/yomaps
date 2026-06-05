@@ -12,8 +12,10 @@
   border-radius: 3px;
 }
 
-/* Track holds all slides in a row */
+/* Track holds the rotating window of slides in a row.
+   position: relative so Flip's absoluteOnLeave card is positioned against it. */
 .track {
+  position: relative;
   display: flex;
   will-change: transform;
 }
@@ -23,14 +25,24 @@
   flex-shrink: 0;
   padding: 0 8px;
   box-sizing: border-box;
+  will-change: transform, opacity;
 }
 
-/* Arrows --------------------------------------------------- */
-.arrow {
-  position: absolute;
-  top: 50%;
-  transform: translateY(calc(-50% - 24px)); /* adjust for footer height */
-  z-index: 10;
+/* Outgoing card: taken out of flow so the row reflows into the caterpillar
+   positions. Flip detects it as "leaving" and animates it out via absoluteOnLeave. */
+.slideLeaving {
+  display: none;
+}
+
+/* Controls (back / pause / next) — shown on mobile + desktop --- */
+.controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+}
+
+.ctrlBtn {
   width: 44px;
   height: 44px;
   display: flex;
@@ -43,64 +55,36 @@
   transition: border-color var(--transition-fast), color var(--transition-fast), background var(--transition-fast);
 }
 
-.arrow svg {
+.ctrlBtn svg {
   width: 18px;
   height: 18px;
 }
 
-.arrowPrev {
-  left: -22px;
-}
-
-.arrowNext {
-  right: -22px;
-}
-
-.arrow:hover:not(.arrowDisabled) {
+.ctrlBtn:hover {
   border-color: var(--color-gold);
   color: var(--color-gold);
   background: var(--color-surface-2);
 }
 
-.arrowDisabled {
-  opacity: 0.25;
-  pointer-events: none;
+/* Center pause/play button is a touch larger and gold-tinted */
+.pauseBtn {
+  width: 50px;
+  height: 50px;
+  border-color: var(--color-border-hover);
 }
 
-/* Footer (dots + progress) --------------------------------- */
+.pauseBtn svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* Footer (controls + autoplay progress) -------------------- */
 .footer {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
   padding: 0 8px;
-}
-
-.dots {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-}
-
-.dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--color-border-hover);
-  border: none;
-  padding: 0;
-  transition: background var(--transition-fast), transform var(--transition-fast), width var(--transition-base);
-}
-
-.dotActive {
-  background: var(--color-gold);
-  width: 20px;
-  border-radius: 3px;
-}
-
-.dot:hover:not(.dotActive) {
-  background: var(--color-text-muted);
-  transform: scale(1.2);
 }
 
 /* Autoplay progress bar */
@@ -120,19 +104,8 @@
   transform: scaleX(0);
 }
 
-/* Responsive: hide arrows on mobile, rely on swipe */
 @media (max-width: 640px) {
-  .arrowPrev,
-  .arrowNext {
-    display: none;
-  }
-
   .slide {
     padding: 0 6px;
   }
-}
-
-@media (min-width: 641px) and (max-width: 1023px) {
-  .arrowPrev { left: -16px; }
-  .arrowNext { right: -16px; }
 }

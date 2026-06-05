@@ -26,6 +26,7 @@ export default function PageTransition({ children }) {
   const pathRefs = useRef([])
   const tlRef = useRef(null)
   const isFirstLoad = useRef(true)
+  const pendingReveal = useRef(false) // true only when a cover curtain was played
   // points[pathIndex][pointIndex] — the y-position of each control point (0–100)
   const allPoints = useRef(
     Array.from({ length: NUM_PATHS }, () => new Array(NUM_POINTS).fill(0))
@@ -87,7 +88,14 @@ export default function PageTransition({ children }) {
 
   // Cover the screen, then swap the routed content underneath.
   useEffect(() => {
-    if (location.pathname === displayLocation.pathname) return
+    // Same path, only search/hash changed (e.g. Shop filters/sort): sync the
+    // displayed location immediately so the page sees it — no curtain.
+    if (location.pathname === displayLocation.pathname) {
+      if (location.search !== displayLocation.search || location.hash !== displayLocation.hash) {
+        setDisplayLocation(location)
+      }
+      return
+    }
 
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     if (prefersReducedMotion) {
@@ -96,6 +104,7 @@ export default function PageTransition({ children }) {
       return
     }
 
+    pendingReveal.current = true
     if (overlayRef.current) overlayRef.current.style.pointerEvents = 'auto'
     animate(true, () => {
       setDisplayLocation(location)
@@ -113,6 +122,10 @@ export default function PageTransition({ children }) {
     }
 
     requestAnimationFrame(refreshTriggers)
+
+    // No curtain was lowered (search/hash-only sync) — nothing to reveal.
+    if (!pendingReveal.current) return
+    pendingReveal.current = false
 
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     if (prefersReducedMotion) {

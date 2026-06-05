@@ -1,7 +1,10 @@
-import { useEffect, useRef, useState, useCallback } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState, useCallback } from 'react'
 import { gsap } from 'gsap'
+import { Flip } from 'gsap/Flip'
 import ProductCard from '../ProductCard/ProductCard'
 import styles from './Slider.module.css'
+
+gsap.registerPlugin(Flip)
 
 const AUTOPLAY_DELAY = 4500
 const DRAG_THRESHOLD = 50
@@ -14,45 +17,119 @@ function getSlidesVisible() {
   return 4
 }
 
-export default function Slider({ products = [], onAddToCart }) {
-  const viewportRef  = useRef(null)
-  const trackRef     = useRef(null)
-  const progressRef  = useRef(null)
-  const autoTimer    = useRef(null)
-  const progressTl   = useRef(null)
-  const dragStart    = useRef(null)
-  const prevBtnRef   = useRef(null)
-  const nextBtnRef   = useRef(null)
+const prefersReducedMotion = () =>
+  window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
-  const [current,       setCurrent]       = useState(0)
+const keyOf = (p) => p._id || p.slug
+
+export default function Slider({ products = [], onAddToCart }) {
+  const viewportRef = useRef(null)
+  const trackRef    = useRef(null)
+  const progressRef = useRef(null)
+  const autoTimer   = useRef(null)
+  const progressTl  = useRef(null)
+  const dragStart   = useRef(null)
+  const prevBtnRef  = useRef(null)
+  const nextBtnRef  = useRef(null)
+
+  // Flip plumbing
+  const isAnimating = useRef(false)
+  const flipState   = useRef(null)
+  const direction   = useRef(true)
+  const isFirst     = useRef(true)
+
+  const [windowStart,   setWindowStart]   = useState(0)
   const [slidesVisible, setSlidesVisible] = useState(getSlidesVisible)
   const [dragging,      setDragging]      = useState(false)
+  const [paused,        setPaused]        = useState(false)
+  // While a card rotates out it stays mounted (hidden) so Flip can animate it.
+  const [transition,    setTransition]    = useState(null) // { leaving, forward } | null
 
-  const maxIndex = Math.max(0, products.length - slidesVisible)
+  const total        = products.length
+  const visibleCount = Math.min(slidesVisible, total)
+  const canRotate    = total > slidesVisible
 
-  // ── helpers ──────────────────────────────────────────────────
-  const getCardWidth = useCallback(() => {
-    if (!viewportRef.current) return 0
-    return viewportRef.current.offsetWidth / slidesVisible
-  }, [slidesVisible])
+  // The window of cards on screen, plus the outgoing card (hidden) during a turn.
+  const baseWindow = Array.from(
+    { length: visibleCount },
+    (_, i) => products[(windowStart + i) % total]
+  )
+  const renderList = transition
+    ? (transition.forward
+        ? [transition.leaving, ...baseWindow]
+        : [...baseWindow, transition.leaving])
+    : baseWindow
+  const leavingKey = transition ? keyOf(transition.leaving) : null
 
-  const goTo = useCallback((index, instant = false) => {
-    const clamped = Math.max(0, Math.min(index, maxIndex))
-    gsap.to(trackRef.current, {
-      x:        -clamped * getCardWidth(),
-      duration: instant ? 0 : 0.65,
-      ease:     'power3.out'
+  // ── caterpillar rotation ─────────────────────────────────────
+  const rotate = useCallback((forward) => {
+    if (!canRotate) return
+    if (prefersReducedMotion()) {
+      setWindowStart((s) => (s + (forward ? 1 : -1) + total) % total)
+      return
+    }
+    if (isAnimating.current || !trackRef.current) return
+    isAnimating.current = true
+    direction.current = forward
+    const leaving = forward
+      ? products[windowStart % total]
+      : products[(windowStart + visibleCount - 1) % total]
+    flipState.current = Flip.getState(trackRef.current.children, { props: 'opacity' })
+    setTransition({ leaving, forward })
+    setWindowStart((s) => (s + (forward ? 1 : -1) + total) % total)
+  }, [canRotate, total, visibleCount, products, windowStart])
+
+  // Run the Flip once the new window (with the hidden outgoing card) has rendered.
+  useLayoutEffect(() => {
+    if (isFirst.current) {
+      isFirst.current = false
+      return
+    }
+    const state = flipState.current
+    if (!state || !trackRef.current) return
+    flipState.current = null
+
+    const forward = direction.current
+    Flip.from(state, {
+      targets: gsap.utils.toArray(trackRef.current.children),
+      absoluteOnLeave: true,
+      fade: true,
+      duration: 0.6,
+      ease: 'power2.inOut',
+      onEnter: (els) =>
+        gsap.fromTo(
+          els,
+          { opacity: 0, scale: 0 },
+          {
+            opacity: 1,
+            scale: 1,
+            transformOrigin: forward ? 'bottom right' : 'bottom left',
+            duration: 0.5,
+            ease: 'power2.out'
+          }
+        ),
+      onLeave: (els) =>
+        gsap.to(els, {
+          opacity: 0,
+          scale: 0,
+          transformOrigin: forward ? 'bottom left' : 'bottom right',
+          duration: 0.5,
+          ease: 'power2.in'
+        }),
+      onComplete: () => {
+        isAnimating.current = false
+        setTransition(null)
+      }
     })
-    setCurrent(clamped)
-  }, [maxIndex, getCardWidth])
+  }, [windowStart])
 
   // ── autoplay ─────────────────────────────────────────────────
   const startAutoplay = useCallback(() => {
-    clearInterval(autoTimer.current)
+    clearTimeout(autoTimer.current)
     if (progressTl.current) progressTl.current.kill()
 
     if (progressRef.current) {
-      gsap.set(progressRef.current, { scaleX: 0 })
+      gsap.set(progressRef.current, { scaleX: 0, opacity: 1 })
       progressTl.current = gsap.to(progressRef.current, {
         scaleX:   1,
         duration: AUTOPLAY_DELAY / 1000,
@@ -60,14 +137,8 @@ export default function Slider({ products = [], onAddToCart }) {
       })
     }
 
-    autoTimer.current = setTimeout(() => {
-      setCurrent(prev => {
-        const next = prev >= maxIndex ? 0 : prev + 1
-        goTo(next)
-        return next
-      })
-    }, AUTOPLAY_DELAY)
-  }, [maxIndex, goTo])
+    autoTimer.current = setTimeout(() => rotate(true), AUTOPLAY_DELAY)
+  }, [rotate])
 
   const stopAutoplay = useCallback(() => {
     clearTimeout(autoTimer.current)
@@ -76,46 +147,44 @@ export default function Slider({ products = [], onAddToCart }) {
   }, [])
 
   const resumeAutoplay = useCallback(() => {
+    if (paused) return
     if (progressRef.current) gsap.to(progressRef.current, { opacity: 1, duration: 0.2 })
     startAutoplay()
-  }, [startAutoplay])
+  }, [startAutoplay, paused])
 
   // ── resize ───────────────────────────────────────────────────
   useEffect(() => {
-    const onResize = () => {
-      const next = getSlidesVisible()
-      setSlidesVisible(next)
-    }
+    const onResize = () => setSlidesVisible(getSlidesVisible())
     window.addEventListener('resize', onResize)
     return () => window.removeEventListener('resize', onResize)
   }, [])
 
-  // ── re-clamp on resize ───────────────────────────────────────
-  useEffect(() => {
-    goTo(Math.min(current, maxIndex), true)
-  }, [slidesVisible]) // eslint-disable-line
-
   // ── autoplay lifecycle ───────────────────────────────────────
   useEffect(() => {
-    if (products.length <= slidesVisible) return
+    if (!canRotate) return
+    if (paused) {
+      clearTimeout(autoTimer.current)
+      if (progressTl.current) progressTl.current.kill()
+      if (progressRef.current) gsap.to(progressRef.current, { opacity: 0, duration: 0.2 })
+      return
+    }
     startAutoplay()
-    return () => { clearTimeout(autoTimer.current) }
-  }, [current, startAutoplay, products.length, slidesVisible])
+    return () => clearTimeout(autoTimer.current)
+  }, [windowStart, startAutoplay, canRotate, paused])
 
   // ── keyboard ─────────────────────────────────────────────────
   useEffect(() => {
     const onKey = (e) => {
-      if (e.key === 'ArrowLeft')  goTo(current - 1)
-      if (e.key === 'ArrowRight') goTo(current + 1)
+      if (e.key === 'ArrowLeft')  rotate(false)
+      if (e.key === 'ArrowRight') rotate(true)
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [current, goTo])
+  }, [rotate])
 
   // ── arrow hover animations ────────────────────────────────────
   const arrowHover = (el, enter) => {
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    if (prefersReducedMotion) return
+    if (prefersReducedMotion() || !el) return
     gsap.to(el, {
       scale:    enter ? 1.1 : 1,
       x:        enter ? (el === prevBtnRef.current ? -3 : 3) : 0,
@@ -124,7 +193,7 @@ export default function Slider({ products = [], onAddToCart }) {
     })
   }
 
-  // ── drag / swipe ─────────────────────────────────────────────
+  // ── swipe ────────────────────────────────────────────────────
   const onPointerDown = (e) => {
     dragStart.current = { x: e.clientX, moved: false }
     setDragging(true)
@@ -133,19 +202,13 @@ export default function Slider({ products = [], onAddToCart }) {
 
   const onPointerMove = (e) => {
     if (!dragStart.current) return
-    const dx = e.clientX - dragStart.current.x
-    if (Math.abs(dx) > 5) dragStart.current.moved = true
-    gsap.set(trackRef.current, { x: -current * getCardWidth() + dx })
+    if (Math.abs(e.clientX - dragStart.current.x) > 5) dragStart.current.moved = true
   }
 
   const onPointerUp = (e) => {
     if (!dragStart.current) return
     const dx = e.clientX - dragStart.current.x
-    if (Math.abs(dx) >= DRAG_THRESHOLD) {
-      goTo(dx < 0 ? current + 1 : current - 1)
-    } else {
-      goTo(current) // snap back
-    }
+    if (Math.abs(dx) >= DRAG_THRESHOLD) rotate(dx < 0)
     setDragging(false)
     dragStart.current = null
     resumeAutoplay()
@@ -157,7 +220,7 @@ export default function Slider({ products = [], onAddToCart }) {
 
   if (!products.length) return null
 
-  const showArrows = products.length > slidesVisible
+  const showArrows = canRotate
 
   return (
     <div
@@ -165,24 +228,7 @@ export default function Slider({ products = [], onAddToCart }) {
       onMouseEnter={stopAutoplay}
       onMouseLeave={resumeAutoplay}
     >
-      {/* Prev arrow */}
-      {showArrows && (
-        <button
-          ref={prevBtnRef}
-          className={`${styles.arrow} ${styles.arrowPrev} ${current === 0 ? styles.arrowDisabled : ''}`}
-          onClick={() => goTo(current - 1)}
-          onMouseEnter={() => arrowHover(prevBtnRef.current, true)}
-          onMouseLeave={() => arrowHover(prevBtnRef.current, false)}
-          aria-label="Previous slide"
-          disabled={current === 0}
-        >
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-            <polyline points="15 18 9 12 15 6" />
-          </svg>
-        </button>
-      )}
-
-      {/* Viewport + draggable track */}
+      {/* Viewport + caterpillar track */}
       <div
         ref={viewportRef}
         className={styles.viewport}
@@ -192,55 +238,72 @@ export default function Slider({ products = [], onAddToCart }) {
         onPointerLeave={onPointerLeaveTrack}
         style={{ cursor: dragging ? 'grabbing' : 'grab' }}
       >
-        <div
-          ref={trackRef}
-          className={styles.track}
-          style={{ userSelect: 'none' }}
-        >
-          {products.map((p) => (
-            <div
-              key={p._id || p.slug}
-              className={styles.slide}
-              style={{ width: `calc(100% / ${slidesVisible})` }}
-              onClick={(e) => { if (dragStart.current?.moved) e.preventDefault() }}
-            >
-              <ProductCard product={p} onAddToCart={onAddToCart} />
-            </div>
-          ))}
+        <div ref={trackRef} className={styles.track} style={{ userSelect: 'none' }}>
+          {renderList.map((p) => {
+            const k = keyOf(p)
+            const isLeaving = k === leavingKey
+            return (
+              <div
+                key={k}
+                data-flip-id={k}
+                className={`${styles.slide} ${isLeaving ? styles.slideLeaving : ''}`}
+                style={{ width: `calc(100% / ${visibleCount})` }}
+                onClick={(e) => { if (dragStart.current?.moved) e.preventDefault() }}
+              >
+                <ProductCard product={p} onAddToCart={onAddToCart} />
+              </div>
+            )
+          })}
         </div>
       </div>
 
-      {/* Next arrow */}
-      {showArrows && (
-        <button
-          ref={nextBtnRef}
-          className={`${styles.arrow} ${styles.arrowNext} ${current >= maxIndex ? styles.arrowDisabled : ''}`}
-          onClick={() => goTo(current + 1)}
-          onMouseEnter={() => arrowHover(nextBtnRef.current, true)}
-          onMouseLeave={() => arrowHover(nextBtnRef.current, false)}
-          aria-label="Next slide"
-          disabled={current >= maxIndex}
-        >
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-            <polyline points="9 18 15 12 9 6" />
-          </svg>
-        </button>
-      )}
-
-      {/* Dots + autoplay progress */}
+      {/* Controls (back / pause / next) + autoplay progress */}
       <div className={styles.footer}>
         {showArrows && (
-          <div className={styles.dots} role="tablist" aria-label="Slider navigation">
-            {Array.from({ length: maxIndex + 1 }).map((_, i) => (
-              <button
-                key={i}
-                role="tab"
-                aria-selected={current === i}
-                aria-label={`Go to slide ${i + 1}`}
-                className={`${styles.dot} ${current === i ? styles.dotActive : ''}`}
-                onClick={() => goTo(i)}
-              />
-            ))}
+          <div className={styles.controls}>
+            <button
+              ref={prevBtnRef}
+              className={styles.ctrlBtn}
+              onClick={() => rotate(false)}
+              onMouseEnter={() => arrowHover(prevBtnRef.current, true)}
+              onMouseLeave={() => arrowHover(prevBtnRef.current, false)}
+              aria-label="Previous slide"
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="15 18 9 12 15 6" />
+              </svg>
+            </button>
+
+            <button
+              className={`${styles.ctrlBtn} ${styles.pauseBtn}`}
+              onClick={() => setPaused((p) => !p)}
+              aria-label={paused ? 'Play autoplay' : 'Pause autoplay'}
+              aria-pressed={paused}
+            >
+              {paused ? (
+                <svg viewBox="0 0 24 24" fill="currentColor" stroke="none">
+                  <polygon points="8 5 19 12 8 19" />
+                </svg>
+              ) : (
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                  <line x1="9" y1="5" x2="9" y2="19" />
+                  <line x1="15" y1="5" x2="15" y2="19" />
+                </svg>
+              )}
+            </button>
+
+            <button
+              ref={nextBtnRef}
+              className={styles.ctrlBtn}
+              onClick={() => rotate(true)}
+              onMouseEnter={() => arrowHover(nextBtnRef.current, true)}
+              onMouseLeave={() => arrowHover(nextBtnRef.current, false)}
+              aria-label="Next slide"
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="9 18 15 12 9 6" />
+              </svg>
+            </button>
           </div>
         )}
         <div className={styles.progressBar}>
