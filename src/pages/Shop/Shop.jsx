@@ -2,6 +2,8 @@ import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { gsap } from 'gsap'
 import { Flip } from 'gsap/Flip'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { useGSAP } from '@gsap/react'
 import { Helmet } from 'react-helmet-async'
 import { getProducts } from '../../lib/api'
 import { useCartStore, useToastStore } from '../../store/cartStore'
@@ -10,7 +12,7 @@ import ProductCard from '../../components/ui/ProductCard/ProductCard'
 import SkeletonCard from '../../components/ui/SkeletonCard/SkeletonCard'
 import styles from './Shop.module.css'
 
-gsap.registerPlugin(Flip)
+gsap.registerPlugin(Flip, ScrollTrigger, useGSAP)
 
 const CATEGORIES = ['apparel', 'headwear', 'accessories', 'lifestyle']
 const SORTS = [
@@ -78,6 +80,37 @@ export default function Shop() {
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [category])
+
+  // Skew on scroll effect
+  useGSAP(() => {
+    if (loading || products.length === 0) return
+
+    let proxy = { skew: 0 }
+    let skewSetter = gsap.quickSetter('.skewElem', 'skewY', 'deg')
+    let clamp = gsap.utils.clamp(-20, 20)
+
+    gsap.set('.skewElem', { transformOrigin: 'right center', force3D: true })
+
+    const trigger = ScrollTrigger.create({
+      onUpdate: (self) => {
+        let skew = clamp(self.getVelocity() / -300)
+        if (Math.abs(skew) > Math.abs(proxy.skew)) {
+          proxy.skew = skew
+          gsap.to(proxy, {
+            skew: 0,
+            duration: 0.8,
+            ease: 'power3',
+            overwrite: true,
+            onUpdate: () => skewSetter(proxy.skew)
+          })
+        }
+      }
+    })
+
+    return () => {
+      trigger.kill()
+    }
+  }, [loading, products])
 
   const setFilter = (cat) => {
     if (cat === category) return
@@ -153,7 +186,7 @@ export default function Shop() {
                 key={p._id || p.slug}
                 data-flip-card
                 data-flip-id={p._id || p.slug}
-                className={styles.cell}
+                className={`${styles.cell} skewElem`}
                 style={{ display: matches(p) ? '' : 'none' }}
               >
                 <ProductCard product={p} onAddToCart={handleAddToCart} />
