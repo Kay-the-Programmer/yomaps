@@ -3,7 +3,7 @@ import { gsap } from 'gsap'
 import { useCartStore } from '../../../store/cartStore'
 import QuantitySelector from '../QuantitySelector/QuantitySelector'
 import ProductSVG from '../ProductSVG/ProductSVG'
-import { formatPrice } from '../../../lib/utils'
+import { formatPrice, imageUrl } from '../../../lib/utils'
 import styles from './CartItem.module.css'
 
 export default function CartItem({ item }) {
@@ -32,10 +32,20 @@ export default function CartItem({ item }) {
     ? formatPrice(lineTotal, 'USD')
     : formatPrice(lineTotal)
 
+  const primaryImage = item.product.images?.[0]
+
   return (
     <div ref={ref} className={styles.item}>
       <div className={styles.image}>
-        <ProductSVG category={item.product.category} name={item.product.name} />
+        {primaryImage ? (
+          <img 
+            src={imageUrl(primaryImage)} 
+            alt={item.product.name}
+            style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '4px' }}
+          />
+        ) : (
+          <ProductSVG category={item.product.category} name={item.product.name} />
+        )}
       </div>
       <div className={styles.details}>
         <span className={styles.name}>{item.product.name}</span>
