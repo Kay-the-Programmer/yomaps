@@ -119,6 +119,18 @@
   justify-content: center;
 }
 
+/* Transparent padding gives the magnetic button a pull "field" larger than the
+   button itself, so it reacts before the cursor reaches it. */
+.magneticZone {
+  display: inline-flex;
+  padding: 18px;
+}
+
+.magLabel {
+  display: inline-block;
+  will-change: transform;
+}
+
 /* ── Scroll cue ─────────────────────────────────────────────── */
 
 .cue {
