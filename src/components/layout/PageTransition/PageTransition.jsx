@@ -11,14 +11,48 @@ gsap.registerPlugin(ScrollTrigger)
 // positions and above-the-fold content never auto-reveals until a scroll.
 const refreshTriggers = () => ScrollTrigger.refresh()
 
-// Jump to the top instantly, bypassing the page's `scroll-behavior: smooth`
-// (a smooth scroll would get aborted by the content swap and leave us partway).
+// Kill ScrollTriggers whose trigger element has left the DOM (orphaned) — i.e. they belong
+// to the page we just navigated away from. React reverts them eventually, but
+// not before our jump-to-top runs, and a lingering *pinned* trigger (e.g. the
+// home page's stacking slides) holds the scroll position and undoes the jump.
+// Filtering by DOM-detachment leaves persistent triggers (navbar) untouched.
+const killOrphanTriggers = () => {
+  ScrollTrigger.getAll().forEach((t) => {
+    if (t.trigger && !document.documentElement.contains(t.trigger)) t.kill()
+  })
+}
+
+// The new page's content can load asynchronously (e.g. the shop grid), and each
+// ScrollTrigger.refresh() that fires as it grows restores the *previous* page's
+// cached scroll, instantly undoing a one-shot jump-to-top. So we re-assert the
+// top every frame for a short window (covered by the reveal curtain) until the
+// scroll has held at 0 for a few consecutive frames.
+const keepTopUntilStable = () => {
+  ScrollTrigger.clearScrollMemory()
+  let stable = 0
+  const start = performance.now()
+  const tick = () => {
+    if (window.scrollY !== 0 || document.documentElement.scrollTop !== 0) {
+      jumpToTop()
+      stable = 0
+    } else {
+      stable++
+    }
+    if (stable < 4 && performance.now() - start < 800) requestAnimationFrame(tick)
+  }
+  requestAnimationFrame(tick)
+}
+
+// Jump to the top instantly, bypassing the page's `scroll-behavior: smooth`.
+// The previous approach (toggling scrollBehavior around window.scrollTo) still
+// left the scroll queued as a smooth animation that the content swap aborted,
+// stranding the new page part-way down. `behavior: 'instant'` guarantees a
+// non-animated jump; the direct scrollTop writes are a fallback for engines
+// that ignore the option.
 const jumpToTop = () => {
-  const el = document.scrollingElement || document.documentElement
-  const prev = el.style.scrollBehavior
-  el.style.scrollBehavior = 'auto'
-  window.scrollTo(0, 0)
-  el.style.scrollBehavior = prev
+  window.scrollTo({ top: 0, left: 0, behavior: 'instant' })
+  document.documentElement.scrollTop = 0
+  document.body.scrollTop = 0
 }
 
 // ── Wavy-curtain tuning (forked from Blake Bowen's "shape overlays" pen) ──
@@ -38,6 +72,10 @@ export default function PageTransition({ children }) {
   const isFirstLoad = useRef(true)
   const pendingReveal = useRef(false)   // true only when a cover curtain was played
   const pendingScrollTop = useRef(false) // true for real (pathname) navigations
+  // ScrollTrigger.refresh() restores the scroll position it had cached (e.g. the
+  // home page's pinned slides), which would undo our jump-to-top. This stays
+  // armed across a navigation so we can re-assert the top *after* that refresh.
+  const resetScrollAfterRefresh = useRef(false)
   // points[pathIndex][pointIndex] — the y-position of each control point (0–100)
   const allPoints = useRef(
     Array.from({ length: NUM_PATHS }, () => new Array(NUM_POINTS).fill(0))
@@ -110,6 +148,7 @@ export default function PageTransition({ children }) {
 
     // A real page change — the new page should start at the top.
     pendingScrollTop.current = true
+    resetScrollAfterRefresh.current = true
 
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     if (prefersReducedMotion) {
@@ -130,9 +169,21 @@ export default function PageTransition({ children }) {
   useLayoutEffect(() => {
     if (pendingScrollTop.current) {
       pendingScrollTop.current = false
+      killOrphanTriggers()
       jumpToTop()
     }
   }, [displayLocation])
+
+  // ScrollTrigger.refresh() can restore a stale scroll position; clear any
+  // remaining orphan triggers and re-assert the top right after it.
+  const refreshAndKeepTop = () => {
+    killOrphanTriggers()
+    refreshTriggers()
+    if (resetScrollAfterRefresh.current) {
+      resetScrollAfterRefresh.current = false
+      keepTopUntilStable()
+    }
+  }
 
   // After the content swaps, reveal the new page.
   useEffect(() => {
@@ -142,7 +193,7 @@ export default function PageTransition({ children }) {
       return
     }
 
-    requestAnimationFrame(refreshTriggers)
+    requestAnimationFrame(refreshAndKeepTop)
 
     // No curtain was lowered (search/hash-only sync) — nothing to reveal.
     if (!pendingReveal.current) return
